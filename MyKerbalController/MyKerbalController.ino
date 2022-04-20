@@ -4,6 +4,7 @@
  Author:	morgoth
 */
 
+#include <Bounce2.h>
 #include <SoftwareSerial.h>
 #include <KerbalSimpit.h>
 
@@ -75,6 +76,29 @@ const int pCAMMODEDOWN = 63;//View mode toggle switch down
 const int pSASONLED = 13;   //SAS On LED indicator
 //const int pRCSONLED = 16;   //RCS On LED indicator
 const int pRCSONLED = 61;   //RCS On LED indicator
+
+//Setup Bounce2 objects
+Bounce2::Button b_TB = Bounce2::Button();
+Bounce2::Button b_RB = Bounce2::Button();
+Bounce2::Button b_SASBTN = Bounce2::Button();
+Bounce2::Button b_ABORTBTN = Bounce2::Button();
+Bounce2::Button b_STAGE = Bounce2::Button();
+Bounce2::Button b_LIGHTS = Bounce2::Button();
+Bounce2::Button b_LADDER = Bounce2::Button();
+Bounce2::Button b_SOLAR = Bounce2::Button();
+Bounce2::Button b_CHUTES = Bounce2::Button();
+Bounce2::Button b_GEARS = Bounce2::Button();
+Bounce2::Button b_BRAKES = Bounce2::Button();
+Bounce2::Button b_ACTION1 = Bounce2::Button();
+Bounce2::Button b_ACTION2 = Bounce2::Button();
+Bounce2::Button b_ACTION3 = Bounce2::Button();
+Bounce2::Button b_ACTION4 = Bounce2::Button();
+Bounce2::Button b_ACTION5 = Bounce2::Button();
+Bounce2::Button b_ACTION6 = Bounce2::Button();
+Bounce2::Button b_ACTION7 = Bounce2::Button();
+Bounce2::Button b_CAMMODEUP = Bounce2::Button();
+Bounce2::Button b_CAMMODEDOWN = Bounce2::Button();
+
 
 //In-game state used to update button LEDs
 bool lights_on = false;
@@ -205,7 +229,7 @@ struct VesselData
     float Heading;                  //47  Vessel Heading relative to surface (degrees)
     //uint16_t ActionGroups;          //48  status bit order:SAS, RCS, Light, Gears, Brakes, Abort, Custom01 - 10
     //byte SOINumber;                 //49  SOI Number (decimal format: sun-planet-moon e.g. 130 = kerbin, 131 = mun)
-    byte SOI;                       //XX  English name of the body being orbited
+    char SOI;                       //XX  English name of the body being orbited
     byte MaxOverHeat;               //50  Max part overheat (% percent)
     byte MaxSkinOverheat;           //XX  Max part skin overheat (% percent)
     float MachNumber;               //51  Mach number
@@ -247,10 +271,6 @@ const int abortLedBlinkTime = 500;  //blink abort LED when armed every 500 ms
 //Variables used in timing
 unsigned long deadtime, deadtimeOld, controlTime, controlTimeOld, stageLedTime, stageLedTimeOld, abortLedTime, abortLedTimeOld;
 unsigned long now;
-
-//Variables used in serial communication
-boolean Connected = false;
-byte id;
 
 // the following variables are unsigned long's because the time, measured
 // in miliseconds, will quickly become a bigger number than can be stored
@@ -564,7 +584,7 @@ void loop() {
         //Send and Receive data
         mySimpit.update();
         get_vessel_data();
-        send_control_packet();
+        send_control_data();
     }
 }
 

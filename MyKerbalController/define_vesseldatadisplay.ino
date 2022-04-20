@@ -290,9 +290,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 		break;
 	//Temperature Limits message
 	case TEMP_LIMIT_MESSAGE:
-		if (msgSize == sizeof(tempLimitPercentage)) {
-			tempLimitPercentage tempLimitInfo;
-			tempLimitInfo = parseMessage<tempLimitPercentage>(msg);
+		if (msgSize == sizeof(tempLimitMessage)) {
+			tempLimitMessage tempLimitInfo;
+			tempLimitInfo = parseMessage<tempLimitMessage>(msg);
 			VData.MaxOverHeat = tempLimitInfo.tempLimitPercentage;
 			VData.MaxSkinOverheat = tempLimitInfo.skinTempLimitPercentage;
 		}
@@ -318,7 +318,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 		break;
 	//SOI message
 	case SOI_MESSAGE:
-		VData.SOI = msg;
+		VData.SOI = msg[0];
 		break;
     }
 
@@ -350,6 +350,7 @@ void define_vessel_data_display() {
 		strVsurf += " m/s";
 		strVsurf.toCharArray(bufferVsurf, 17);
 		writeLCD(bufferVsurf);
+		/* Unable to display acceleration for now, as KSimpit does not provide it
 		//Acceleration (G)
 		jumpToLineTwo();
 		char bufferGee[17];
@@ -358,6 +359,29 @@ void define_vessel_data_display() {
 		strGee += " G";
 		strGee.toCharArray(bufferGee, 17);
 		writeLCD(bufferGee);
+		*/
+		//Radar Altitude (m)
+		jumpToLineTwo();
+		char bufferRAlt[17];
+		String strRAlt = "Alt: ";
+		if (VData.RAlt < 10000 && VData.RAlt > -10000) {
+			strRAlt += String(VData.RAlt, 0);
+			strRAlt += "m ";
+		}
+		else if ((VData.RAlt >= 10000 && VData.RAlt < 10000000) || (VData.RAlt <= -10000 && VData.RAlt > -10000000)) {
+			strRAlt += String((VData.RAlt / 1000.0), 0);
+			strRAlt += "km ";
+		}
+		else if ((VData.RAlt >= 10000000 && VData.RAlt < 10000000000) || (VData.RAlt <= -10000000 && VData.RAlt > -10000000000)) {
+			strRAlt += String((VData.RAlt / 1000000.0), 0);
+			strRAlt += "Mm ";
+		}
+		else {
+			strRAlt += String((VData.RAlt / 1000000000.0), 0);
+			strRAlt += "Gm ";
+		}
+		strRAlt.toCharArray(bufferRAlt, 17);
+		writeLCD(bufferRAlt);
 	}
 
 	if (!digitalRead(pLCDx) && digitalRead(pLCDy) && digitalRead(pLCDz)) {
@@ -463,6 +487,7 @@ void define_vessel_data_display() {
 		writeLCD("Heat: ");
 		writeLCD(t);
 		writeLCD("%");
+		/* Unable to display acceleration for now, as KSimpit does not provide it
 		//Acceleration (G)
 		jumpToLineTwo();
 		char bufferGee[17];
@@ -471,6 +496,29 @@ void define_vessel_data_display() {
 		strGee += " G";
 		strGee.toCharArray(bufferGee, 17);
 		writeLCD(bufferGee);
+		*/
+		//Radar Altitude (m)
+		jumpToLineTwo();
+		char bufferRAlt[17];
+		String strRAlt = "Alt: ";
+		if (VData.RAlt < 10000 && VData.RAlt > -10000) {
+			strRAlt += String(VData.RAlt, 0);
+			strRAlt += "m ";
+		}
+		else if ((VData.RAlt >= 10000 && VData.RAlt < 10000000) || (VData.RAlt <= -10000 && VData.RAlt > -10000000)) {
+			strRAlt += String((VData.RAlt / 1000.0), 0);
+			strRAlt += "km ";
+		}
+		else if ((VData.RAlt >= 10000000 && VData.RAlt < 10000000000) || (VData.RAlt <= -10000000 && VData.RAlt > -10000000000)) {
+			strRAlt += String((VData.RAlt / 1000000.0), 0);
+			strRAlt += "Mm ";
+		}
+		else {
+			strRAlt += String((VData.RAlt / 1000000000.0), 0);
+			strRAlt += "Gm ";
+		}
+		strRAlt.toCharArray(bufferRAlt, 17);
+		writeLCD(bufferRAlt);
 	}
 
 	if (!digitalRead(pLCDx) && digitalRead(pLCDy) && !digitalRead(pLCDz)) {
@@ -487,7 +535,7 @@ void define_vessel_data_display() {
 		jumpToLineTwo();
 		char bufferMachNumber[17];
 		String strMach = "Mach:";
-		strMach += String(VData.G, 0);
+		strMach += String(VData.MachNumber, 0);
 		strMach.toCharArray(bufferMachNumber, 17);
 		writeLCD(bufferMachNumber);
 	}
