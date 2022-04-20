@@ -151,9 +151,9 @@ struct VesselData
     float e;                        //7   orbital eccentricity (unitless, 0 = circular, > 1 = escape)
     float inc;                      //8   orbital inclination (degrees)
     //float G;                        //9   acceleration (Gees)
-    byte TWI;                      //XX  Thrust to Weight Index
-    long TAp;                       //10  time to AP (seconds)
-    long TPe;                       //11  time to PE (seconds)
+    byte TWI;                       //XX  Thrust to Weight Index
+    int32_t TAp;                    //10  time to AP (seconds)
+    int32_t TPe;                    //11  time to PE (seconds)
     float PEArg;                    //XX  argument of periapsis (degrees)
     float TrueAnomaly;              //12  orbital true anomaly (degrees)
     float MeanAnomaly;              //XX  orbital mean anomaly (degrees)
@@ -163,8 +163,8 @@ struct VesselData
     float RAlt;                     //15  radar altitude (m)
     float Alt;                      //16  altitude above sea level (m)
     float Vsurf;                    //17  surface velocity (m/s)
-    float Lat;                      //18  Latitude (degree)
-    float Lon;                      //19  Longitude (degree)
+    //float Lat;                      //18  Latitude (degree)
+    //float Lon;                      //19  Longitude (degree)
     float LiquidFuelTot;            //20  Liquid Fuel Total
     float LiquidFuel;               //21  Liquid Fuel remaining
     float OxidizerTot;              //22  Oxidizer Total
@@ -173,8 +173,8 @@ struct VesselData
     float ecAvailable;              //25  Electric Charge remaining
     float monoPropTotal;            //26  Mono Propellant Total
     float monoPropAvailable;        //27  Mono Propellant remaining
-    float IntakeAirTot;             //28  Intake Air Total
-    float IntakeAir;                //29  Intake Air remaining
+    //float IntakeAirTot;             //28  Intake Air Total
+    //float IntakeAir;                //29  Intake Air remaining
     float SolidFuelTot;             //30  Solid Fuel Total
     float SolidFuel;                //31  Solid Fuel remaining
     float solidFuelSAvailable;      //XX  Solid Fuel Remaining (stage)
@@ -189,21 +189,25 @@ struct VesselData
     float liquidFuelSAvailable;     //35  Liquid Fuel remaining (stage)
     float oxidizerSTotal;           //36  Oxidizer Total (stage)
     float oxidizerSAvailable;       //37  Oxidizer remaining (stage)
-    float LithiumFuel;              //38  Lithium Fuel Remaining
-    float LithiumFuelTot;           //39  Lithium Fuel Total
-    int32_t APTime;                 //XX  Time to Apoapsis
-    int32_t PETime;                 //XX  Time to Periapsis
-    uint32_t MissionTime;           //40  Time since launch (s)
-    float deltaTime;                //41  Time since last packet (s)
+    //float LithiumFuel;              //38  Lithium Fuel Remaining
+    //float LithiumFuelTot;           //39  Lithium Fuel Total
+    //uint32_t MissionTime;           //40  Time since launch (s)
+    //float deltaTime;                //41  Time since last packet (s)
     float VOrbit;                   //42  Orbital speed (m/s)
-    uint32_t MNTime;                //43  Time to next node (s) [0 when no node]
+    float MNTime;                   //43  Time to next node (s) [0 when no node]
     float MNDeltaV;                 //44  Delta V for next node (m/s) [0 when no node]
+    float MNDuration;               //XX  Duration of next maneuver node (s)
+    float MNDeltaVTotal;            //XX  Total DeltaV of planned nodes 
+    float StageDeltaV;              //XX  Delta V in current stage
+    float TotalDeltaV;              //XX  Delta V in vessel
     float Pitch;                    //45  Vessel Pitch relative to surface (degrees)
     float Roll;                     //46  Vessel Roll relative to surface (degrees)
     float Heading;                  //47  Vessel Heading relative to surface (degrees)
     //uint16_t ActionGroups;          //48  status bit order:SAS, RCS, Light, Gears, Brakes, Abort, Custom01 - 10
-    byte SOINumber;                 //49  SOI Number (decimal format: sun-planet-moon e.g. 130 = kerbin, 131 = mun)
+    //byte SOINumber;                 //49  SOI Number (decimal format: sun-planet-moon e.g. 130 = kerbin, 131 = mun)
+    byte SOI;                       //XX  English name of the body being orbited
     byte MaxOverHeat;               //50  Max part overheat (% percent)
+    byte MaxSkinOverheat;           //XX  Max part skin overheat (% percent)
     float MachNumber;               //51  Mach number
     float IAS;                      //52  Indicated Air Speed
     byte CurrentStage;              //53  Current stage number
@@ -214,8 +218,9 @@ struct VesselData
     float TargetHeading;            //XX  Target heading relative
     float TargetPitchV;             //XX  Target Pitch velocity relative
     float TargetHeadingV;           //XX  Target heading velocity relative
-    float DeltaVActual;             //57  Vessel DeltaV in flight
+    //float DeltaVActual;             //57  Vessel DeltaV in flight
     float BurnTime;                 //58  Vessel Total burn time
+    float BurnTimeS;                //XX  Stage burn time
     byte CameraMode;                //59  Current Vessel Camera Mode
     byte Temp;                      //Temp assignment of values
     //No longer in use
@@ -314,7 +319,14 @@ void setup() {
     mySimpit.registerChannel(TARGETINFO_MESSAGE);
     mySimpit.registerChannel(ORBIT_MESSAGE);
     mySimpit.registerChannel(FLIGHT_STATUS_MESSAGE);
-
+    mySimpit.registerChannel(AIRSPEED_MESSAGE);
+    mySimpit.registerChannel(ROTATION_DATA);
+    mySimpit.registerChannel(DELTAV_MESSAGE);
+    mySimpit.registerChannel(BURNTIME_MESSAGE);
+    mySimpit.registerChannel(TEMP_LIMIT_MESSAGE);
+    mySimpit.registerChannel(ATMO_CONDITIONS_MESSAGE);
+    mySimpit.registerChannel(MANEUVER_MESSAGE);
+    mySimpit.registerChannel(SOI_MESSAGE);
 }
 
 void loop() {

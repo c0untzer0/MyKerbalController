@@ -210,8 +210,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 		if (msgSize == sizeof(apsidesTimeMessage)) {
 			apsidesTimeMessage apsidesTimeInfo;
 			apsidesTimeInfo = parseMessage<apsidesTimeMessage>(msg);
-			VData.APTime = apsidesTimeInfo.apoapsis;
-			VData.PETime = apsidesTimeInfo.periapsis;
+			VData.TAp = apsidesTimeInfo.apoapsis;
+			VData.TPe = apsidesTimeInfo.periapsis;
 		}
 		break;
     //Target info message
@@ -250,6 +250,75 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.CurrentStage = flightInfo.currentStage;
 			VData.TWI = flightInfo.currentTWIndex;
 		}
+		break;
+	//Airspeed message
+	case AIRSPEED_MESSAGE:
+		if (msgSize == sizeof(airspeedMessage)) {
+			airspeedMessage airspeedInfo;
+			airspeedInfo = parseMessage<airspeedMessage>(msg);
+			VData.IAS = airspeedInfo.IAS;
+			VData.MachNumber = airspeedInfo.mach;
+		}
+		break;
+	//Rotation message
+	case ROTATION_DATA:
+		if (msgSize == sizeof(vesselPointingMessage)) {
+			vesselPointingMessage pointingInfo;
+			pointingInfo = parseMessage<vesselPointingMessage>(msg);
+			VData.Heading = pointingInfo.heading;
+			VData.Pitch = pointingInfo.pitch;
+			VData.Roll = pointingInfo.roll;
+		}
+		break;
+	//DeltaV message
+	case DELTAV_MESSAGE:
+		if (msgSize == sizeof(deltaVMessage)) {
+			deltaVMessage deltaVInfo;
+			deltaVInfo = parseMessage<deltaVMessage>(msg);
+			VData.StageDeltaV = deltaVInfo.stageDeltaV;
+			VData.TotalDeltaV = deltaVInfo.totalDeltaV;
+		}
+		break;
+	//Burn Time message
+	case BURNTIME_MESSAGE:
+		if (msgSize == sizeof(burnTimeMessage)) {
+			burnTimeMessage burnTInfo;
+			burnTInfo = parseMessage<burnTimeMessage>(msg);
+			VData.BurnTime = burnTInfo.totalBurnTime;
+			VData.BurnTimeS = burnTInfo.stageBurnTime;
+		}
+		break;
+	//Temperature Limits message
+	case TEMP_LIMIT_MESSAGE:
+		if (msgSize == sizeof(tempLimitPercentage)) {
+			tempLimitPercentage tempLimitInfo;
+			tempLimitInfo = parseMessage<tempLimitPercentage>(msg);
+			VData.MaxOverHeat = tempLimitInfo.tempLimitPercentage;
+			VData.MaxSkinOverheat = tempLimitInfo.skinTempLimitPercentage;
+		}
+		break;
+	//Atmospheric conditions message
+	case ATMO_CONDITIONS_MESSAGE:
+		if (msgSize == sizeof(atmoConditionsMessage)) {
+			atmoConditionsMessage atmoInfo;
+			atmoInfo = parseMessage<atmoConditionsMessage>(msg);
+			VData.Density = atmoInfo.airDensity;
+		}
+		break;
+	//Maneuver message
+	case MANEUVER_MESSAGE:
+		if (msgSize == sizeof(maneuverMessage)) {
+			maneuverMessage maneuverInfo;
+			maneuverInfo = parseMessage<maneuverMessage>(msg);
+			VData.MNTime = maneuverInfo.timeToNextManeuver;
+			VData.MNDeltaV = maneuverInfo.deltaVNextManeuver;
+			VData.MNDuration = maneuverInfo.durationNextManeuver;
+			VData.MNDeltaVTotal = maneuverInfo.deltaVTotal;
+		}
+		break;
+	//SOI message
+	case SOI_MESSAGE:
+		VData.SOI = msg;
 		break;
     }
 
