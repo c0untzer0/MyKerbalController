@@ -7,6 +7,7 @@
 #include <Bounce2.h>
 #include <SoftwareSerial.h>
 #include <KerbalSimpit.h>
+#include <avr/wdt.h>
 
 SoftwareSerial mySerial(15, 14); //Pin 14 connected to LCD, 15 unconnected
 
@@ -262,6 +263,7 @@ VesselData VData;
 
 //debug variable
 bool debug = false;
+bool serial_initialized = false;
 
 //Timing
 const int IDLETIMER = 20000;        //if no message received from KSP for more than 20s, go idle (default 2000)
@@ -285,6 +287,12 @@ unsigned long now;
 // communicate using the "Serial" device.
 KerbalSimpit mySimpit(Serial);
 
+void reboot() {
+    wdt_disable();
+    wdt_enable(WDTO_15MS);
+    while (1) {}
+}
+
 void setup() {
 
     Serial.begin(115200);  //KSPSerialIO connection
@@ -302,60 +310,74 @@ void setup() {
     //Initialize
     controlsInit();   //set all pin modes and rotation of sas rotary switch
     testLEDS(100);     //blink every LED once to test (with a delay of 100 ms)
-    // This loop continually attempts to handshake with the plugin.
-    // It will keep retrying until it gets a successful handshake.
-    while (!mySimpit.init()) {
-        delay(100);
-        clearLCD();
-        writeLCD("KerbalController");
-        jumpToLineTwo();
-        writeLCD("connecting...");
-    }
-    //InitTxPackets();  //initialize the serial communication
 
-    // Sets our callback function. The KerbalSimpit library will
-    // call this function every time a packet is received.
-    mySimpit.inboundHandler(messageHandler);
-    // Send a message to the plugin registering for the Action status channel.
-    // The plugin will now regularly send Action status  messages while the
-    // flight scene is active in-game.
-    mySimpit.registerChannel(ACTIONSTATUS_MESSAGE);
-    // Send registration for Custom Action Groups
-    mySimpit.registerChannel(CAGSTATUS_MESSAGE);
-    // Send registration for SAS Info
-    mySimpit.registerChannel(SAS_MODE_INFO_MESSAGE);
-    // Send registration for Fuel types
-    //mySimpit.registerChannel(LF_MESSAGE);
-    mySimpit.registerChannel(LF_STAGE_MESSAGE);
-    mySimpit.registerChannel(SF_STAGE_MESSAGE);
-    mySimpit.registerChannel(OX_STAGE_MESSAGE);
-    mySimpit.registerChannel(ELECTRIC_MESSAGE);
-    mySimpit.registerChannel(MONO_MESSAGE);
-    mySimpit.registerChannel(XENON_GAS_STAGE_MESSAGE);
-    mySimpit.registerChannel(CUSTOM_RESOURCE_1_MESSAGE);
-    //Register for altitude,AP/PE,velocity and time to AP/PE info
-    mySimpit.registerChannel(ALTITUDE_MESSAGE);
-    mySimpit.registerChannel(APSIDES_MESSAGE);
-    mySimpit.registerChannel(VELOCITY_MESSAGE);
-    mySimpit.registerChannel(APSIDESTIME_MESSAGE);
-    mySimpit.registerChannel(TARGETINFO_MESSAGE);
-    mySimpit.registerChannel(ORBIT_MESSAGE);
-    mySimpit.registerChannel(FLIGHT_STATUS_MESSAGE);
-    mySimpit.registerChannel(AIRSPEED_MESSAGE);
-    mySimpit.registerChannel(ROTATION_DATA);
-    mySimpit.registerChannel(DELTAV_MESSAGE);
-    mySimpit.registerChannel(BURNTIME_MESSAGE);
-    mySimpit.registerChannel(TEMP_LIMIT_MESSAGE);
-    mySimpit.registerChannel(ATMO_CONDITIONS_MESSAGE);
-    mySimpit.registerChannel(MANEUVER_MESSAGE);
-    mySimpit.registerChannel(SOI_MESSAGE);
+    //Check initial debug mode
+    if (!digitalRead(pMODE)) { debug = true; }
+    else
+    {
+        debug = false;
+    }
+
+    if (!debug) {
+        // This loop continually attempts to handshake with the plugin.
+        // It will keep retrying until it gets a successful handshake.
+        while (!mySimpit.init()) {
+            delay(100);
+            clearLCD();
+            writeLCD("KerbalController");
+            jumpToLineTwo();
+            writeLCD("connecting...");
+        }
+        //InitTxPackets();  //initialize the serial communication
+
+        // Sets our callback function. The KerbalSimpit library will
+        // call this function every time a packet is received.
+        mySimpit.inboundHandler(messageHandler);
+        // Send a message to the plugin registering for the Action status channel.
+        // The plugin will now regularly send Action status  messages while the
+        // flight scene is active in-game.
+        mySimpit.registerChannel(ACTIONSTATUS_MESSAGE);
+        // Send registration for Custom Action Groups
+        mySimpit.registerChannel(CAGSTATUS_MESSAGE);
+        // Send registration for SAS Info
+        mySimpit.registerChannel(SAS_MODE_INFO_MESSAGE);
+        // Send registration for Fuel types
+        //mySimpit.registerChannel(LF_MESSAGE);
+        mySimpit.registerChannel(LF_STAGE_MESSAGE);
+        mySimpit.registerChannel(SF_STAGE_MESSAGE);
+        mySimpit.registerChannel(OX_STAGE_MESSAGE);
+        mySimpit.registerChannel(ELECTRIC_MESSAGE);
+        mySimpit.registerChannel(MONO_MESSAGE);
+        mySimpit.registerChannel(XENON_GAS_STAGE_MESSAGE);
+        mySimpit.registerChannel(CUSTOM_RESOURCE_1_MESSAGE);
+        //Register for altitude,AP/PE,velocity and time to AP/PE info
+        mySimpit.registerChannel(ALTITUDE_MESSAGE);
+        mySimpit.registerChannel(APSIDES_MESSAGE);
+        mySimpit.registerChannel(VELOCITY_MESSAGE);
+        mySimpit.registerChannel(APSIDESTIME_MESSAGE);
+        mySimpit.registerChannel(TARGETINFO_MESSAGE);
+        mySimpit.registerChannel(ORBIT_MESSAGE);
+        mySimpit.registerChannel(FLIGHT_STATUS_MESSAGE);
+        mySimpit.registerChannel(AIRSPEED_MESSAGE);
+        mySimpit.registerChannel(ROTATION_DATA);
+        mySimpit.registerChannel(DELTAV_MESSAGE);
+        mySimpit.registerChannel(BURNTIME_MESSAGE);
+        mySimpit.registerChannel(TEMP_LIMIT_MESSAGE);
+        mySimpit.registerChannel(ATMO_CONDITIONS_MESSAGE);
+        mySimpit.registerChannel(MANEUVER_MESSAGE);
+        mySimpit.registerChannel(SOI_MESSAGE);
+    }
 }
 
 void loop() {
 
     //Check mode
     if (!digitalRead(pMODE)) { debug = true; }
-    else { debug = false; }
+    else
+    {
+	    debug = false;
+        if (!debug && !serial_initialized) { reboot(); }
+    }
 
     if (debug) {
         //Debug mode does not communicate with KSPSerialIO, but simply displays the button states on the LCD.
