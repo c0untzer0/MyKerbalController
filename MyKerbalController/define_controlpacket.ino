@@ -1,5 +1,18 @@
 //Define what controls to send to KSP
 
+//Enumeration of SAS Modes
+#define SMOFF          255
+#define SMSAS          0
+#define SMPrograde     1
+#define SMRetroGrade   2
+#define SMNormal       3
+#define SMAntinormal   4
+#define SMRadialIn     5
+#define SMRadialOut    6
+#define SMTarget       7
+#define SMAntiTarget   8
+#define SMManeuverNode 9
+
 //Define the SAS Rotary encoder checks and actions
 void check_rotary() {
 
