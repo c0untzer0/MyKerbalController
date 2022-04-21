@@ -152,6 +152,11 @@ byte cameraMode;
 //int target_mode;
 int sas_mode = 255;
 int prev_sas_mode = 255;
+bool sas_is_on = true;
+bool rcs_is_on = false;
+
+//Store old Throttle and joysticks values to avoid sending unnecessary data
+int16_t old_throttle;
 
 //SAS rotary encoder variables
 int sasPreviousCLK;
@@ -295,7 +300,7 @@ void reboot() {
 
 void setup() {
 
-    Serial.begin(115200);  //KSPSerialIO connection
+    Serial.begin(57600);  //KSPSerialIO connection
     mySerial.begin(9600); //LCD connection
     delay(500);           //wait for LCD boot
 
@@ -609,7 +614,8 @@ void loop() {
         //Send and Receive data
         mySimpit.update();
         get_vessel_data();
-        send_control_data();
+        //send_control_data();
+        check_and_send_data();
     }
 }
 

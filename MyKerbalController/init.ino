@@ -267,6 +267,6 @@ void testLEDS(int testdelay) {
 
     //latch the values in when done shifting
     digitalWrite(sasLEDLatch, HIGH);
-
+    mySimpit.printToKSP("Init done at Arduino...");
 }
 

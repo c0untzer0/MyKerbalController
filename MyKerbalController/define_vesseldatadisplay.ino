@@ -1,5 +1,19 @@
 //grab info from KSP here (VData object) and write out results to the Arduino pins
 
+
+//Enumeration of SAS Modes
+#define SMOFF          255
+#define SMSAS          0
+#define SMPrograde     1
+#define SMRetroGrade   2
+#define SMNormal       3
+#define SMAntinormal   4
+#define SMRadialIn     5
+#define SMRadialOut    6
+#define SMTarget       7
+#define SMAntiTarget   8
+#define SMManeuverNode 9
+
 //Message Handler function
 void messageHandler(byte messageType, byte msg[], byte msgSize) {
 	byte currentActionStatus;
@@ -8,6 +22,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
     case ACTIONSTATUS_MESSAGE:
         // Checking if the message is the size we expect is a very basic
         // way to confirm if the message was received properly.
+		mySimpit.printToKSP("ACTIONSTATUS_MESSAGE received at Arduino...");
         if (msgSize == 1) {
             currentActionStatus = msg[0];
 
@@ -31,20 +46,26 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
             }
             if (currentActionStatus & SAS_ACTION) {
                 sas_led_on = true;
+				sas_is_on = true;
             }
             else {
                 sas_led_on = false;
+				sas_is_on = false;
             }
             if (currentActionStatus & RCS_ACTION) {
                 rcs_led_on = true;
+				rcs_is_on = true;
             }
             else {
                 rcs_led_on = false;
+				rcs_is_on = false;
             }
         }
+		mySimpit.printToKSP("ACTIONSTATUS_MESSAGE processed at Arduino...");
         break;
 	//Custom Action Group Messages
     case CAGSTATUS_MESSAGE:
+		mySimpit.printToKSP("CAGSTATUS_MESSAGE received at Arduino...");
         if (msgSize == sizeof(cagStatusMessage)) {
             cagStatusMessage cagStatus;
             cagStatus = parseMessage<cagStatusMessage>(msg);
@@ -109,65 +130,81 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
                 chutes_on = false;
             }
         }
+		mySimpit.printToKSP("CAGSTATUS_MESSAGE processed at Arduino...");
         break;
 	//SAS Mode Messages
     case SAS_MODE_INFO_MESSAGE:
+		mySimpit.printToKSP("SAS_MODE_INFO_MESSAGE received at Arduino...");
         if (msgSize == sizeof(SASInfoMessage)) {
             SASInfoMessage SASModeInfo;
             SASModeInfo = parseMessage<SASInfoMessage>(msg);
             sas_mode = SASModeInfo.currentSASMode;
         }
+		mySimpit.printToKSP("SAS_MODE_INFO_MESSAGE processed at Arduino...");
         break;
 	//Fuel Messages
     case LF_STAGE_MESSAGE:
+		mySimpit.printToKSP("LF_STAGE_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage liquidFuelSInfo;
             liquidFuelSInfo = parseMessage<resourceMessage>(msg);
 			VData.liquidFuelSAvailable = liquidFuelSInfo.available;
 			VData.liquidFuelSTotal = liquidFuelSInfo.total;
         }
+		mySimpit.printToKSP("LF_STAGE_MESSAGE processed at Arduino...");
         break;
     case SF_STAGE_MESSAGE:
+		mySimpit.printToKSP("SF_STAGE_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage solidFuelSInfo;
             solidFuelSInfo = parseMessage<resourceMessage>(msg);
 			VData.solidFuelSAvailable = solidFuelSInfo.available;
 			VData.solidFuelSTotal = solidFuelSInfo.total;
         }
+		mySimpit.printToKSP("SF_STAGE_MESSAGE processed at Arduino...");
         break;
     case OX_STAGE_MESSAGE:
+		mySimpit.printToKSP("OX_STAGE_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage oxidizerSInfo;
             oxidizerSInfo = parseMessage<resourceMessage>(msg);
 			VData.oxidizerSAvailable = oxidizerSInfo.available;
 			VData.oxidizerSTotal = oxidizerSInfo.total;
         }
+		mySimpit.printToKSP("OX_STAGE_MESSAGE processed at Arduino...");
         break;
     case ELECTRIC_MESSAGE:
+		mySimpit.printToKSP("ELECTRIC_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage ecInfo;
             ecInfo = parseMessage<resourceMessage>(msg);
 			VData.ecAvailable = ecInfo.available;
 			VData.ecTotal = ecInfo.total;
         }
+		mySimpit.printToKSP("ELECTRIC_MESSAGE processed at Arduino...");
         break;
     case MONO_MESSAGE:
+		mySimpit.printToKSP("MONO_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage monoPropInfo;
             monoPropInfo = parseMessage<resourceMessage>(msg);
 			VData.monoPropAvailable = monoPropInfo.available;
 			VData.monoPropTotal = monoPropInfo.total;
         }
+		mySimpit.printToKSP("MONO_MESSAGE processed at Arduino...");
         break;
     case XENON_GAS_STAGE_MESSAGE:
+		mySimpit.printToKSP("XENON_GAS_STAGE_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage xenonGasSInfo;
             xenonGasSInfo = parseMessage<resourceMessage>(msg);
 			VData.xenonGasSAvailable = xenonGasSInfo.available;
 			VData.xenonGasSTotal = xenonGasSInfo.total;
         }
+		mySimpit.printToKSP("XENON_GAS_STAGE_MESSAGE processed at Arduino...");
         break;
     case CUSTOM_RESOURCE_1_MESSAGE:
+		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE received at Arduino...");
         if (msgSize == sizeof(CustomResourceMessage)) {
             CustomResourceMessage customResourceInfo;
             customResourceInfo = parseMessage<CustomResourceMessage>(msg);
@@ -176,27 +213,33 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.customResource2Available = customResourceInfo.currentResource2;
 			VData.customResource2Total = customResourceInfo.maxResource2;
         }
+		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE processed at Arduino...");
         break;
     //Altitude Message
 	case ALTITUDE_MESSAGE:
+		mySimpit.printToKSP("ALTITUDE_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(altitudeMessage)) {
 			altitudeMessage altitudeInfo;
 			altitudeInfo = parseMessage<altitudeMessage>(msg);
 			VData.Alt= altitudeInfo.sealevel;
 			VData.RAlt = altitudeInfo.surface;
 		}
+		mySimpit.printToKSP("ALTITUDE_MESSAGE processed at Arduino...");
 		break;
 	//Apoapsis and Periapsis Message
 	case APSIDES_MESSAGE:
+		mySimpit.printToKSP("APSIDES_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(apsidesMessage)) {
 			apsidesMessage apsidesInfo;
 			apsidesInfo = parseMessage<apsidesMessage>(msg);
 			VData.AP = apsidesInfo.apoapsis;
 			VData.PE = apsidesInfo.periapsis;
 		}
+		mySimpit.printToKSP("APSIDES_MESSAGE processed at Arduino...");
 		break;
 	//Velocity Message
 	case VELOCITY_MESSAGE:
+		mySimpit.printToKSP("VELOCITY_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(velocityMessage)) {
 			velocityMessage velocityInfo;
 			velocityInfo = parseMessage<velocityMessage>(msg);
@@ -204,18 +247,22 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Vsurf = velocityInfo.surface;
 			VData.VVI = velocityInfo.vertical;
 		}
+		mySimpit.printToKSP("VELOCITY_MESSAGE processed at Arduino...");
 		break;
 	//Times to apoapsis and periapsis
     case APSIDESTIME_MESSAGE:
+		mySimpit.printToKSP("APSIDESTIME_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(apsidesTimeMessage)) {
 			apsidesTimeMessage apsidesTimeInfo;
 			apsidesTimeInfo = parseMessage<apsidesTimeMessage>(msg);
 			VData.TAp = apsidesTimeInfo.apoapsis;
 			VData.TPe = apsidesTimeInfo.periapsis;
 		}
+		mySimpit.printToKSP("APSIDESTIME_MESSAGE processed at Arduino...");
 		break;
     //Target info message
 	case TARGETINFO_MESSAGE:
+		mySimpit.printToKSP("TARGETINFO_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(targetMessage)) {
 			targetMessage targetInfo;
 			targetInfo = parseMessage<targetMessage>(msg);
@@ -226,9 +273,11 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.TargetPitchV = targetInfo.velocityPitch;
 			VData.TargetHeadingV = targetInfo.velocityHeading;
 		}
+		mySimpit.printToKSP("TARGETINFO_MESSAGE processed at Arduino...");
 		break;
     //Orbit message
 	case ORBIT_MESSAGE:
+		mySimpit.printToKSP("ORBIT_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(orbitInfoMessage)) {
 			orbitInfoMessage orbitInfo;
 			orbitInfo = parseMessage<orbitInfoMessage>(msg);
@@ -241,27 +290,33 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.SemiMajorAxis = orbitInfo.semiMajorAxis;
 			VData.LongAscNode = orbitInfo.longAscendingNode;
 		}
+		mySimpit.printToKSP("ORBIT_MESSAGE processed at Arduino...");
 		break;
     //Flight status message
 	case FLIGHT_STATUS_MESSAGE:
+		mySimpit.printToKSP("FLIGHT_STATUS_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(flightStatusMessage)) {
 			flightStatusMessage flightInfo;
 			flightInfo = parseMessage<flightStatusMessage>(msg);
 			VData.CurrentStage = flightInfo.currentStage;
 			VData.TWI = flightInfo.currentTWIndex;
 		}
+		mySimpit.printToKSP("FLIGHT_STATUS_MESSAGE processed at Arduino...");
 		break;
 	//Airspeed message
 	case AIRSPEED_MESSAGE:
+		mySimpit.printToKSP("AIRSPEED_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(airspeedMessage)) {
 			airspeedMessage airspeedInfo;
 			airspeedInfo = parseMessage<airspeedMessage>(msg);
 			VData.IAS = airspeedInfo.IAS;
 			VData.MachNumber = airspeedInfo.mach;
 		}
+		mySimpit.printToKSP("AIRSPEED_MESSAGE processed at Arduino...");
 		break;
 	//Rotation message
 	case ROTATION_DATA:
+		mySimpit.printToKSP("ROTATION_DATA received at Arduino...");
 		if (msgSize == sizeof(vesselPointingMessage)) {
 			vesselPointingMessage pointingInfo;
 			pointingInfo = parseMessage<vesselPointingMessage>(msg);
@@ -269,44 +324,54 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Pitch = pointingInfo.pitch;
 			VData.Roll = pointingInfo.roll;
 		}
+		mySimpit.printToKSP("ROTATION_DATA processed at Arduino...");
 		break;
 	//DeltaV message
 	case DELTAV_MESSAGE:
+		mySimpit.printToKSP("DELTAV_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(deltaVMessage)) {
 			deltaVMessage deltaVInfo;
 			deltaVInfo = parseMessage<deltaVMessage>(msg);
 			VData.StageDeltaV = deltaVInfo.stageDeltaV;
 			VData.TotalDeltaV = deltaVInfo.totalDeltaV;
 		}
+		mySimpit.printToKSP("DELTAV_MESSAGE processed at Arduino...");
 		break;
 	//Burn Time message
 	case BURNTIME_MESSAGE:
+		mySimpit.printToKSP("BURNTIME_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(burnTimeMessage)) {
 			burnTimeMessage burnTInfo;
 			burnTInfo = parseMessage<burnTimeMessage>(msg);
 			VData.BurnTime = burnTInfo.totalBurnTime;
 			VData.BurnTimeS = burnTInfo.stageBurnTime;
 		}
+		mySimpit.printToKSP("BURNTIME_MESSAGE processed at Arduino...");
 		break;
 	//Temperature Limits message
 	case TEMP_LIMIT_MESSAGE:
+		mySimpit.printToKSP("TEMP_LIMIT_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(tempLimitMessage)) {
 			tempLimitMessage tempLimitInfo;
 			tempLimitInfo = parseMessage<tempLimitMessage>(msg);
 			VData.MaxOverHeat = tempLimitInfo.tempLimitPercentage;
 			VData.MaxSkinOverheat = tempLimitInfo.skinTempLimitPercentage;
 		}
+		mySimpit.printToKSP("TEMP_LIMIT_MESSAGE processed at Arduino...");
 		break;
 	//Atmospheric conditions message
 	case ATMO_CONDITIONS_MESSAGE:
+		mySimpit.printToKSP("ATMO_CONDITIONS_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(atmoConditionsMessage)) {
 			atmoConditionsMessage atmoInfo;
 			atmoInfo = parseMessage<atmoConditionsMessage>(msg);
 			VData.Density = atmoInfo.airDensity;
 		}
+		mySimpit.printToKSP("ATMO_CONDITIONS_MESSAGE processed at Arduino...");
 		break;
 	//Maneuver message
 	case MANEUVER_MESSAGE:
+		mySimpit.printToKSP("MANEUVER_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(maneuverMessage)) {
 			maneuverMessage maneuverInfo;
 			maneuverInfo = parseMessage<maneuverMessage>(msg);
@@ -315,10 +380,13 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.MNDuration = maneuverInfo.durationNextManeuver;
 			VData.MNDeltaVTotal = maneuverInfo.deltaVTotal;
 		}
+		mySimpit.printToKSP("MANEUVER_MESSAGE processed at Arduino...");
 		break;
 	//SOI message
 	case SOI_MESSAGE:
+		mySimpit.printToKSP("SOI_MESSAGE received at Arduino...");
 		VData.SOI = msg[0];
+		mySimpit.printToKSP("SOI_MESSAGE processed at Arduino...");
 		break;
     }
 
@@ -382,6 +450,7 @@ void define_vessel_data_display() {
 		}
 		strRAlt.toCharArray(bufferRAlt, 17);
 		writeLCD(bufferRAlt);
+		mySimpit.printToKSP("Speed calculations done at Arduino...");
 	}
 
 	if (!digitalRead(pLCDx) && digitalRead(pLCDy) && digitalRead(pLCDz)) {
@@ -599,14 +668,40 @@ void define_vessel_data_display() {
 	digitalWrite(pRCSONLED, rcs_led_on);
 
 	//Fuel Gauges
-	vSF = 100 * VData.solidFuelSAvailable / VData.solidFuelSTotal; //percentage of solid fuel remaining
-	vLF = 100 * VData.liquidFuelSAvailable / VData.liquidFuelSTotal; //percentage of liquid fuel remaining in current stage
-	vOX = 100 * VData.oxidizerSAvailable / VData.oxidizerSTotal; //percentage of oxidized remaining in current stage
-	vEL = 100 * VData.ecAvailable / VData.ecTotal; //percentage of electric charge remaining
-	vMP = 100 * VData.monoPropAvailable / VData.monoPropTotal; //percentage of monopropellant remaining
-	vXE = 100 * VData.xenonGasSAvailable / VData.xenonGasSTotal; //percentage of Xenon Gas remaining
-	vLI = 100 * VData.customResource1Available / VData.customResource1Total; //percentage of Xenon Gas remaining
-	vXX = 100 * VData.customResource2Available / VData.customResource2Total; //percentage of Xenon Gas remaining
+	if (VData.solidFuelSAvailable != 0)
+	{
+		vSF = 100 * VData.solidFuelSAvailable / VData.solidFuelSTotal; //percentage of solid fuel remaining
+	}
+	else { vSF = 0; }
+	if (VData.liquidFuelSTotal != 0) {
+		vLF = 100 * VData.liquidFuelSAvailable / VData.liquidFuelSTotal; //percentage of liquid fuel remaining in current stage
+	}
+	else { vLF = 0; }
+	if (VData.oxidizerSTotal != 0) {
+		vOX = 100 * VData.oxidizerSAvailable / VData.oxidizerSTotal; //percentage of oxidized remaining in current stage
+	}
+	else { vOX = 0; }
+	if (VData.ecTotal != 0) {
+		vEL = 100 * VData.ecAvailable / VData.ecTotal; //percentage of electric charge remaining
+	}
+	else { vEL = 0; }
+	if (VData.monoPropTotal != 0) {
+		vMP = 100 * VData.monoPropAvailable / VData.monoPropTotal; //percentage of monopropellant remaining
+	}
+	else { vMP = 0; }
+	if (VData.xenonGasSTotal != 0) {
+		vXE = 100 * VData.xenonGasSAvailable / VData.xenonGasSTotal; //percentage of Xenon Gas remaining
+	}
+	else { vXE = 0; }
+	if (VData.customResource1Total != 0) {
+		vLI = 100 * VData.customResource1Available / VData.customResource1Total; //percentage of Xenon Gas remaining
+	}
+	else { vLI = 0; }
+	if (VData.customResource2Total != 0) {
+		vXX = 100 * VData.customResource2Available / VData.customResource2Total; //percentage of Xenon Gas remaining
+	}
+	else { vXX = 0; }
+	mySimpit.printToKSP("Fuel calculations done at Arduino");
 
 	//scale down to 0-9 for binary calculations
 	SF = constrain(map(vSF, 100, 0, 0, 9), 0, 9);
@@ -618,7 +713,7 @@ void define_vessel_data_display() {
 	LI = constrain(map(vLI, 100, 0, 0, 9), 0, 9);
 	XX = constrain(map(vXX, 100, 0, 0, 9), 0, 9);
 
-	//calculate the power of 2. Now each value in binary is all zeroes an a single 1. we can use that to light one LED in each LED bar (dot mode)
+	//calculate the power of 2. Now each value in binary is all zeroes and a single 1. we can use that to light one LED in each LED bar (dot mode)
 	int powOX = 0.1 + pow(2, OX);
 	int powEL = 0.1 + pow(2, EL);
 	int powMP = 0.1 + pow(2, MP);
@@ -627,6 +722,16 @@ void define_vessel_data_display() {
 	int powXE = 0.1 + pow(2, XE);
 	int powLI = 0.1 + pow(2, LI);
 	int powXX = 0.1 + pow(2, XX);
+
+	mySimpit.printToKSP("Arduino SF Fuel at: " + powSF);
+	mySimpit.printToKSP("Arduino LF Fuel at: " + powLF);
+	mySimpit.printToKSP("Arduino OX Fuel at: " + powOX);
+	mySimpit.printToKSP("Arduino MP Fuel at: " + powMP);
+	mySimpit.printToKSP("Arduino EL Fuel at: " + powEL);
+	mySimpit.printToKSP("Arduino XE Fuel at: " + powXE);
+	mySimpit.printToKSP("Arduino LI Fuel at: " + powLI);
+	mySimpit.printToKSP("Arduino XX Fuel at: " + powXX);
+
 
 	//map the 8-bit 595 shift registers to the 10-bit LED bars, specific to the way I wired them
 	inputBytes[0] = powXX;
@@ -656,6 +761,7 @@ void define_vessel_data_display() {
 	//latch the values in when done shifting
 	digitalWrite(latchPin, HIGH);
 
+	mySimpit.printToKSP("Fuel display calculations done at Arduino");
 
 	//Prepare to light up corresponding SAS LED
 	switch (sas_mode) {
@@ -704,6 +810,7 @@ void define_vessel_data_display() {
 		sasInputBytes[1] = B00000000;
 		break;
 	}
+	
 
 	//prepare the SAS LEDs shift register
 	digitalWrite(sasLEDLatch, LOW);
@@ -720,6 +827,7 @@ void define_vessel_data_display() {
 	//latch the values in when done shifting
 	digitalWrite(sasLEDLatch, HIGH);
 
+	mySimpit.printToKSP("SAS display calculations done at Arduino");
 }
 
 int get_vessel_data() {
