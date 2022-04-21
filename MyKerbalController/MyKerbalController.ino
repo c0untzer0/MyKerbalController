@@ -148,8 +148,9 @@ int rz_value;
 byte cameraMode;
 
 //SAS mode variables
-int target_mode;
+//int target_mode;
 int sas_mode = 255;
+int prev_sas_mode = 255;
 
 //SAS rotary encoder variables
 int sasPreviousCLK;
@@ -245,7 +246,7 @@ struct VesselData
     //float DeltaVActual;             //57  Vessel DeltaV in flight
     float BurnTime;                 //58  Vessel Total burn time
     float BurnTimeS;                //XX  Stage burn time
-    byte CameraMode;                //59  Current Vessel Camera Mode
+    //byte CameraMode;                //59  Current Vessel Camera Mode
     byte Temp;                      //Temp assignment of values
     //No longer in use
     //byte NavballSASMode;    //60  Combined byte for navball target mode and SAS mode
@@ -275,10 +276,11 @@ unsigned long now;
 // the following variables are unsigned long's because the time, measured
 // in miliseconds, will quickly become a bigger number than can be stored
 // in an int.
-unsigned long lastDebounceTime = 0;  // the last time the output pin
+//unsigned long lastDebounceTime = 0;  // the last time the output pin
                                      // was toggled
-unsigned long debounceDelay = 50;    // the debounce time; increase
+//unsigned long debounceDelay = 50;    // the debounce time; increase
                                      // if the output flickers
+
 // Declare a KerbalSimpit object that will
 // communicate using the "Serial" device.
 KerbalSimpit mySimpit(Serial);

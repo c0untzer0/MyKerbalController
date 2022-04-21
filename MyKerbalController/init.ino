@@ -102,6 +102,26 @@ void controlsInit() {
     pinMode(pRCSONLED, OUTPUT);
     sasPreviousCLK = digitalRead(sasClockPin);
     sasPreviousDATA = digitalRead(sasDataPin);
+    b_TB.setPressedState(LOW);
+    b_RB.setPressedState(LOW);
+    b_SASBTN.setPressedState(LOW);
+    b_ABORTBTN.setPressedState(LOW);
+    b_STAGE.setPressedState(LOW);
+    b_LIGHTS.setPressedState(LOW);
+    b_LADDER.setPressedState(LOW);
+    b_SOLAR.setPressedState(LOW);
+    b_CHUTES.setPressedState(LOW);
+    b_GEARS.setPressedState(LOW);
+    b_BRAKES.setPressedState(LOW);
+    b_ACTION1.setPressedState(LOW);
+    b_ACTION2.setPressedState(LOW);
+    b_ACTION3.setPressedState(LOW);
+    b_ACTION4.setPressedState(LOW);
+    b_ACTION5.setPressedState(LOW);
+    b_ACTION6.setPressedState(LOW);
+    b_ACTION7.setPressedState(LOW);
+    b_CAMMODEUP.setPressedState(LOW);
+    b_CAMMODEDOWN.setPressedState(LOW);
 }
 
 void testLEDS(int testdelay) {

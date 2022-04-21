@@ -47,6 +47,7 @@ void check_rotary() {
         temp_sas_mode = 10;
     }
     sas_mode = temp_sas_mode;
+	if (sas_mode != prev_sas_mode) { mySimpit.setSASMode(sas_mode); }
 }
 
 void check_and_send_data() {
@@ -90,7 +91,7 @@ void check_and_send_data() {
 	}
 
 	//momentary abort button
-	if (!digitalRead(pABORTBTN) && digitalRead(pABORT)) { mySimpit.activateAction(ABORT_ACTION); }
+	if (b_ABORTBTN.pressed() && digitalRead(pABORT)) { mySimpit.activateAction(ABORT_ACTION); }
 	else { mySimpit.deactivateAction(ABORT_ACTION); }
 	if (digitalRead(pABORT)) {
 		now = millis();
@@ -104,7 +105,7 @@ void check_and_send_data() {
 	digitalWrite(pABORTBTNLED, abort_led_on);
 
 	//momentary stage button
-	if (!digitalRead(pSTAGE) && digitalRead(pARM)) { mySimpit.activateAction(STAGE_ACTION); }
+	if (b_STAGE.pressed() && digitalRead(pARM)) { mySimpit.activateAction(STAGE_ACTION); }
 	else { mySimpit.deactivateAction(STAGE_ACTION); }
 	if (digitalRead(pARM)) {
 		now = millis();
@@ -118,19 +119,19 @@ void check_and_send_data() {
 	digitalWrite(pSTAGELED, stage_led_on);
 
 	//toggle buttons
-	if (!digitalRead(pLIGHTS)) { mySimpit.toggleAction(LIGHT_ACTION); }
-	if (!digitalRead(pGEARS)) { mySimpit.toggleAction(GEAR_ACTION); }
-	if (!digitalRead(pBRAKES)) { mySimpit.toggleAction(BRAKES_ACTION); }
-	if (!digitalRead(pACTION1)) { mySimpit.toggleCAG(1); }
-	if (!digitalRead(pACTION2)) { mySimpit.toggleCAG(2); }
-	if (!digitalRead(pACTION3)) { mySimpit.toggleCAG(3); }
-	if (!digitalRead(pACTION4)) { mySimpit.toggleCAG(4); }
-	if (!digitalRead(pACTION5)) { mySimpit.toggleCAG(5); }
-	if (!digitalRead(pACTION6)) { mySimpit.toggleCAG(6); }
-	if (!digitalRead(pACTION7)) { mySimpit.toggleCAG(7); }
-	if (!digitalRead(pLADDER)) { mySimpit.toggleCAG(8); }
-	if (!digitalRead(pSOLAR)) { mySimpit.toggleCAG(9); }
-	if (!digitalRead(pCHUTES)) { mySimpit.toggleCAG(10); }
+	if (b_LIGHTS.pressed()) { mySimpit.toggleAction(LIGHT_ACTION); }
+	if (b_GEARS.pressed()) { mySimpit.toggleAction(GEAR_ACTION); }
+	if (b_BRAKES.pressed()) { mySimpit.toggleAction(BRAKES_ACTION); }
+	if (b_ACTION1.pressed()) { mySimpit.toggleCAG(1); }
+	if (b_ACTION2.pressed()) { mySimpit.toggleCAG(2); }
+	if (b_ACTION3.pressed()) { mySimpit.toggleCAG(3); }
+	if (b_ACTION4.pressed()) { mySimpit.toggleCAG(4); }
+	if (b_ACTION5.pressed()) { mySimpit.toggleCAG(5); }
+	if (b_ACTION6.pressed()) { mySimpit.toggleCAG(6); }
+	if (b_ACTION7.pressed()) { mySimpit.toggleCAG(7); }
+	if (b_LADDER.pressed()) { mySimpit.toggleCAG(8); }
+	if (b_SOLAR.pressed()) { mySimpit.toggleCAG(9); }
+	if (b_CHUTES.pressed()) { mySimpit.toggleCAG(10); }
 
 	//throttle
 	throttleMessage throttle_msg;
@@ -138,8 +139,8 @@ void check_and_send_data() {
 	mySimpit.send(THROTTLE_MESSAGE, throttle_msg);
 	
 	//rotation joystick button toggles flight control modes
-	if (!digitalRead(pRB) && !rb_prev) { rb_on = !rb_on; rb_prev = true; }
-	if (digitalRead(pRB) && rb_prev) { rb_prev = false; }
+	if (b_RB.pressed() && !rb_prev) { rb_on = !rb_on; rb_prev = true; }
+	if (!b_RB.pressed() && rb_prev) { rb_prev = false; }
 	rotationMessage rot_msg;
 	translationMessage tra_msg;
 	int16_t pitch = 0;
@@ -177,17 +178,18 @@ void check_and_send_data() {
 	tra_msg.setXYZ(tr_x, tr_y, tr_z);
 
 	//translation joystick button resets camera view to neutral
-	if (!digitalRead(pTB) && !tb_prev) { tb_on = !tb_on; tb_prev = true; }
-	if (digitalRead(pTB) && tb_prev) { tb_prev = false; }
+	if (b_TB.pressed() && !tb_prev) { tb_on = !tb_on; tb_prev = true; }
+	if (!b_TB.pressed() && tb_prev) { tb_prev = false; }
 	if (tb_on)
 	{
 		cameraRotationMessage cam_rot;
 		cam_rot.setPitchRollYawZoom(0, 0, 0, 0);
 	}
 
+	/* No Target modes on KSimpit
 	//SAS Selector Button toggles SAS Target modes
-	if (!digitalRead(pSASBTN) && !sasb_prev) { sasb_on = !sasb_on; sasb_prev = true; }
-	if (digitalRead(pSASBTN) && sasb_prev) { sasb_prev = false; }
+	if (b_SASBTN.pressed() && !sasb_prev) { sasb_on = !sasb_on; sasb_prev = true; }
+	if (!b_SASBTN.pressed() && sasb_prev) { sasb_prev = false; }
 	if (sasb_on) {
 		target_mode = getNavballMode();
 		if (target_mode == 3) {
@@ -198,28 +200,52 @@ void check_and_send_data() {
 		}
 		setNavballMode(target_mode);
 	}
+	*/
+
+	//SAS Selector Button cycles camera views
+	if (b_SASBTN.pressed()) {
+		if (cameraMode == 6) {
+			cameraMode = 1;
+		}
+		else {
+			cameraMode++;
+		}
+		mySimpit.setCameraMode(cameraMode);
+	}
 
 	//SAS Selector Rotary Encoder for changing SAS modes
 	// If enough time has passed check the rotary encoder
 	if ((millis() - sasTimeOfLastDebounce) > sasDelayofDebounce) {
-		check_rotary();  // Rotary Encoder check routine defined above
+		if (sas_mode != 255) { check_rotary(); }  // Rotary Encoder check routine defined above
 		sasPreviousCLK = digitalRead(sasClockPin);
 		sasPreviousDATA = digitalRead(sasDataPin);
 		sasTimeOfLastDebounce = millis();  // Set variable to current millis() timer
 	}
 
+	/*Changing the behavior of camera switch until I have better integration with API
 	//Toggle switch for selecting camera mode
 	cameraMode = 0;
-	if (digitalRead(pCAMMODEUP)) {
+	if (b_CAMMODEUP.pressed()) {
 		cameraMode = 1;
 	}
-	else if (digitalRead(pCAMMODEDOWN)) {
+	else if (b_CAMMODEDOWN.pressed()) {
 		cameraMode = -1;
 	}
 	setCameraMode(cameraMode);
-
-	//send the control packet to the KSPSerialIO plugin
-	KSPBoardSendData(details(CPacket));
+	*/
+	//Set the View toggle switch actions
+	if (b_CAMMODEUP.pressed())
+	{
+		//Map view toggle if the switch is toggled up
+		keyboardEmulatorMessage keystroke_up(0x4D);
+		mySimpit.send(KEYBOARD_EMULATOR, keystroke_up);
+	}
+	if (b_CAMMODEDOWN.pressed())
+	{
+		//Next vessel switch if switch is toggled down
+		keyboardEmulatorMessage keystroke_down(0xDD);
+		mySimpit.send(KEYBOARD_EMULATOR, keystroke_down);
+	}
 }
 
 
@@ -233,58 +259,7 @@ void send_control_data() {
     }
 }
 
-//define the structure of a control packet
-struct ControlPacket {
-    //the following controls can be sent to the KSPSerialIO plugin (defined by the plugin)
-    byte id;
-    byte MainControls;                  //SAS RCS Lights Gears Brakes Precision Abort Stage (see enum)
-    byte Mode;                          //0 = stage, 1 = docking, 2 = map
-    int CameraModeSwitch;                     //Camera Mode (0 = No change, 1 = Mode Up, -1 = Mode down)
-    unsigned int ControlGroup;          //action groups 1-10
-    byte NavballSASMode;                //AutoPilot mode
-    byte AdditionalControlByte1;
-    int Pitch;                          //-1000 -> 1000
-    int Roll;                           //-1000 -> 1000
-    int Yaw;                            //-1000 -> 1000
-    int TX;                             //-1000 -> 1000
-    int TY;                             //-1000 -> 1000
-    int TZ;                             //-1000 -> 1000
-    int WheelSteer;                     //-1000 -> 1000
-    int Throttle;                       //    0 -> 1000
-    int WheelThrottle;                  //    0 -> 1000
-};
 
-//Create an instance of a control packet
-ControlPacket CPacket;
-
-//macro used to generate the control packet (also used for the handshake packet)
-#define details(name) (uint8_t*)&name,sizeof(name)
-
-//Control groups (action groups) uses an integer to refer to a custom action group, e.g. ControlGroup(5,true);
-void ControlGroups(byte n, boolean s) {
-    if (s)
-        CPacket.ControlGroup |= (1 << n);       // forces nth bit of x to be 1.  all other bits left alone.
-    else
-        CPacket.ControlGroup &= ~(1 << n);      // forces nth bit of x to be 0.  all other bits left alone.
-}
-
-//Enumeration of SAS Modes
-#define SMOFF          255
-#define SMSAS          0
-#define SMPrograde     1
-#define SMRetroGrade   2
-#define SMNormal       3
-#define SMAntinormal   4
-#define SMRadialIn     5
-#define SMRadialOut    6
-#define SMTarget       7
-#define SMAntiTarget   8
-#define SMManeuverNode 9
-
-//Vessel camera mode 
-void setCameraMode(int c) {
-    CPacket.CameraModeSwitch = c;
-}
 
 
 
