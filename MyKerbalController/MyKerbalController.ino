@@ -328,6 +328,7 @@ void setup() {
             jumpToLineTwo();
             writeLCD("connecting...");
         }
+        serial_initialized = true;
         //InitTxPackets();  //initialize the serial communication
 
         // Sets our callback function. The KerbalSimpit library will
