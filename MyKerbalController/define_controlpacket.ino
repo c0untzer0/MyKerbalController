@@ -2,6 +2,7 @@
 
 //Define the SAS Rotary encoder checks and actions
 void check_rotary() {
+	mySimpit.printToKSP((String)"DBG: "+__LINE__+":"+__FUNCTION__);
 
     int temp_sas_mode = sas_mode;
     //Remove the step logic for middle steps, as two steps make one SAS change
@@ -48,13 +49,14 @@ void check_rotary() {
     }
     sas_mode = temp_sas_mode;
 	if (sas_mode != prev_sas_mode) { mySimpit.setSASMode(sas_mode); }
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	mySimpit.printToKSP("SAS mode sent from Arduino...");
 }
 
 void check_and_send_data() {
 
 	//here we define what controls to send when which pins are manipulated
-
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	//First, update all temporary switches using Bounce2
 	b_TB.update();
 	b_RB.update();
@@ -80,21 +82,25 @@ void check_and_send_data() {
 	mySimpit.printToKSP("Bounce switches updated at Arduino...");
 
 	//toggle switches
-	if (!digitalRead(pSAS) && !sas_is_on) {
+	if (digitalRead(pSAS) && !sas_is_on) {
 		mySimpit.activateAction(SAS_ACTION);
 		mySimpit.printToKSP("SAS active sent from Arduino...");
+		sas_led_on = true;
 	}
 	else if (sas_is_on) {
 		mySimpit.deactivateAction(SAS_ACTION);
 		mySimpit.printToKSP("SAS deactive sent from Arduino...");
+		sas_led_on = false;
 	}
-	if (!digitalRead(pRCS) && !rcs_is_on) {
+	if (digitalRead(pRCS) && !rcs_is_on) {
 		mySimpit.activateAction(RCS_ACTION);
 		mySimpit.printToKSP("RCS active sent from Arduino...");
+		rcs_led_on = true;
 	}
 	else if (rcs_is_on) {
 		mySimpit.deactivateAction(RCS_ACTION);
 		mySimpit.printToKSP("RCS deactive sent from Arduino...");
+		rcs_led_on = false;
 	}
 
 	//momentary abort button
@@ -132,10 +138,12 @@ void check_and_send_data() {
 	else { stage_led_on = false; }
 	digitalWrite(pSTAGELED, stage_led_on);
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	//toggle buttons
 	if (b_LIGHTS.pressed()) {
 		mySimpit.toggleAction(LIGHT_ACTION);
 		mySimpit.printToKSP("Lights toggle sent from Arduino...");
+		lights_on = !lights_on;
 	}
 	if (b_GEARS.pressed()) { mySimpit.toggleAction(GEAR_ACTION); }
 	if (b_BRAKES.pressed()) { mySimpit.toggleAction(BRAKES_ACTION); }
@@ -150,6 +158,7 @@ void check_and_send_data() {
 	if (b_SOLAR.pressed()) { mySimpit.toggleCAG(9); }
 	if (b_CHUTES.pressed()) { mySimpit.toggleCAG(10); }
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	//throttle
 	throttleMessage throttle_msg;
 	throttle_msg.throttle = map(analogRead(pTHROTTLE), 30, 990, INT16_MAX, 0);
@@ -158,11 +167,14 @@ void check_and_send_data() {
 		mySimpit.printToKSP("Throttle sent from Arduino...");
 		old_throttle = throttle_msg.throttle;
 	}
-	
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+
 	//rotation joystick button toggles flight control modes
 	if (b_RB.pressed() && !rb_prev) { rb_on = !rb_on; rb_prev = true; }
 	if (!b_RB.pressed() && rb_prev) { rb_prev = false; }
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+	/*
 	//Send Joysticks info
 	rotationMessage rot_msg;
 	translationMessage tra_msg;
@@ -201,6 +213,8 @@ void check_and_send_data() {
 	tra_msg.setXYZ(tr_x, tr_y, tr_z);
 	mySimpit.printToKSP("Joysticks info sent from Arduino...");
 	
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+	*/
 
 	//translation joystick button resets camera view to neutral
 	if (b_TB.pressed() && !tb_prev) { tb_on = !tb_on; tb_prev = true; }
@@ -212,6 +226,7 @@ void check_and_send_data() {
 	}
 	mySimpit.printToKSP("Joysticks button1 info sent from Arduino...");
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	/* No Target modes on KSimpit
 	//SAS Selector Button toggles SAS Target modes
 	if (b_SASBTN.pressed() && !sasb_prev) { sasb_on = !sasb_on; sasb_prev = true; }
@@ -230,6 +245,7 @@ void check_and_send_data() {
 
 	//SAS Selector Button cycles camera views
 	if (b_SASBTN.pressed()) {
+		mySimpit.printToKSP("SAS Button pressed!!!");
 		if (cameraMode == 6) {
 			cameraMode = 1;
 		}
@@ -238,6 +254,7 @@ void check_and_send_data() {
 		}
 		mySimpit.setCameraMode(cameraMode);
 	}
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//SAS Selector Rotary Encoder for changing SAS modes
 	// If enough time has passed check the rotary encoder
@@ -248,7 +265,6 @@ void check_and_send_data() {
 		sasTimeOfLastDebounce = millis();  // Set variable to current millis() timer
 	}
 	mySimpit.printToKSP("SAS button info sent from Arduino...");
-
 	/*Changing the behavior of camera switch until I have better integration with API
 	//Toggle switch for selecting camera mode
 	cameraMode = 0;
@@ -260,10 +276,14 @@ void check_and_send_data() {
 	}
 	setCameraMode(cameraMode);
 	*/
+
+	/*
 	//Set the View toggle switch actions
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	if (b_CAMMODEUP.pressed())
 	{
 		//Map view toggle if the switch is toggled up
+		mySimpit.printToKSP("CAMUP Button pressed!!!");
 		keyboardEmulatorMessage keystroke_up(0x4D);
 		mySimpit.send(KEYBOARD_EMULATOR, keystroke_up);
 		mySimpit.printToKSP("View button1 info sent from Arduino...");
@@ -271,10 +291,13 @@ void check_and_send_data() {
 	if (b_CAMMODEDOWN.pressed())
 	{
 		//Next vessel switch if switch is toggled down
+		mySimpit.printToKSP("CAMDOWN Button pressed!!!");
 		keyboardEmulatorMessage keystroke_down(0xDD);
 		mySimpit.send(KEYBOARD_EMULATOR, keystroke_down);
 		mySimpit.printToKSP("View button2 info sent from Arduino...");
 	}
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+	*/
 }
 
 /* Maybe not needed?

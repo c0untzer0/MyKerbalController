@@ -208,18 +208,18 @@ struct VesselData
     //float IntakeAir;                //29  Intake Air remaining
     float SolidFuelTot;             //30  Solid Fuel Total
     float SolidFuel;                //31  Solid Fuel remaining
-    float solidFuelSAvailable;      //XX  Solid Fuel Remaining (stage)
-    float solidFuelSTotal;          //XX  Solid Fuel Total (stage)
+    //float solidFuelSAvailable;      //XX  Solid Fuel Remaining (stage)
+    //float solidFuelSTotal;          //XX  Solid Fuel Total (stage)
     float customResource1Available; //XX  Custom Resource 1 Available (Lithium)
     float customResource1Total;     //XX  Custom Resource 1 Total (Lithium)
     float customResource2Available; //XX  Custom Resource 2 Available (Air)
     float customResource2Total;     //XX  Custom Resource 2 Total (Air)
-    float xenonGasSTotal;           //32  Xenon Gas Total
-    float xenonGasSAvailable;       //33  Xenon Gas remaining
-    float liquidFuelSTotal;         //34  Liquid Fuel Total (stage)
-    float liquidFuelSAvailable;     //35  Liquid Fuel remaining (stage)
-    float oxidizerSTotal;           //36  Oxidizer Total (stage)
-    float oxidizerSAvailable;       //37  Oxidizer remaining (stage)
+    float xenonGasTotal;           //32  Xenon Gas Total
+    float xenonGasAvailable;       //33  Xenon Gas remaining
+    //float liquidFuelSTotal;         //34  Liquid Fuel Total (stage)
+    //float liquidFuelSAvailable;     //35  Liquid Fuel remaining (stage)
+    //float oxidizerSTotal;           //36  Oxidizer Total (stage)
+    //float oxidizerSAvailable;       //37  Oxidizer remaining (stage)
     //float LithiumFuel;              //38  Lithium Fuel Remaining
     //float LithiumFuelTot;           //39  Lithium Fuel Total
     //uint32_t MissionTime;           //40  Time since launch (s)
@@ -293,6 +293,7 @@ unsigned long now;
 KerbalSimpit mySimpit(Serial);
 
 void reboot() {
+    mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
     wdt_disable();
     wdt_enable(WDTO_15MS);
     while (1) {}
@@ -300,10 +301,11 @@ void reboot() {
 
 void setup() {
 
-    Serial.begin(57600);  //KSPSerialIO connection
+    Serial.begin(38400);  //KSPSerialIO connection
     mySerial.begin(9600); //LCD connection
     delay(500);           //wait for LCD boot
 
+    mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
     //write to LCD
     clearLCD();
@@ -349,12 +351,12 @@ void setup() {
         mySimpit.registerChannel(SAS_MODE_INFO_MESSAGE);
         // Send registration for Fuel types
         //mySimpit.registerChannel(LF_MESSAGE);
-        mySimpit.registerChannel(LF_STAGE_MESSAGE);
-        mySimpit.registerChannel(SF_STAGE_MESSAGE);
-        mySimpit.registerChannel(OX_STAGE_MESSAGE);
+        mySimpit.registerChannel(LF_MESSAGE);
+        mySimpit.registerChannel(SF_MESSAGE);
+        mySimpit.registerChannel(OX_MESSAGE);
         mySimpit.registerChannel(ELECTRIC_MESSAGE);
         mySimpit.registerChannel(MONO_MESSAGE);
-        mySimpit.registerChannel(XENON_GAS_STAGE_MESSAGE);
+        mySimpit.registerChannel(XENON_GAS_MESSAGE);
         mySimpit.registerChannel(CUSTOM_RESOURCE_1_MESSAGE);
         //Register for altitude,AP/PE,velocity and time to AP/PE info
         mySimpit.registerChannel(ALTITUDE_MESSAGE);
@@ -527,16 +529,16 @@ void loop() {
         digitalWrite(clockPin, LOW);
         digitalWrite(latchPin, LOW);
 
-        inputBytes[0] = B11111111;
-        inputBytes[1] = B11111111;
-        inputBytes[2] = B11111111;
-        inputBytes[3] = B11111111;
-        inputBytes[4] = B11111111;
-        inputBytes[5] = B11111111;
-        inputBytes[6] = B11111111;
-        inputBytes[7] = B11111111;
-        inputBytes[8] = B11111111;
-        inputBytes[9] = B11111111;
+        inputBytes[0] = B00000000;
+        inputBytes[1] = B00000000;
+        inputBytes[2] = B00000000;
+        inputBytes[3] = B00000000;
+        inputBytes[4] = B00000000;
+        inputBytes[5] = B00000000;
+        inputBytes[6] = B00000000;
+        inputBytes[7] = B00000000;
+        inputBytes[8] = B00000000;
+        inputBytes[9] = B00000001;
         //loop through the input bytes
         for (int j = 0; j <= 9; j++) {
             byte inputByte = inputBytes[j];
@@ -610,7 +612,7 @@ void loop() {
     else {
 
         //KSP mode
-
+        mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         //Send and Receive data
         mySimpit.update();
         get_vessel_data();

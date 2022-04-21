@@ -16,6 +16,7 @@
 
 //Message Handler function
 void messageHandler(byte messageType, byte msg[], byte msgSize) {
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	byte currentActionStatus;
     switch (messageType) {
 	//Action Groups Messages
@@ -61,7 +62,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 				rcs_is_on = false;
             }
         }
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("ACTIONSTATUS_MESSAGE processed at Arduino...");
+		mySimpit.printToKSP((String)"STATE: S:"+sas_is_on+" R:"+rcs_is_on+" B:"+brakes_on+" G:"+gears_on+" L:"+lights_on);
         break;
 	//Custom Action Group Messages
     case CAGSTATUS_MESSAGE:
@@ -130,7 +133,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
                 chutes_on = false;
             }
         }
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("CAGSTATUS_MESSAGE processed at Arduino...");
+		mySimpit.printToKSP((String)"CAGSTATE: C:" + chutes_on + " S:" + solar_on + " L:" + ladder_on + " 1:" + action1_on + " 2:" + action2_on);
         break;
 	//SAS Mode Messages
     case SAS_MODE_INFO_MESSAGE:
@@ -140,38 +145,42 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
             SASModeInfo = parseMessage<SASInfoMessage>(msg);
             sas_mode = SASModeInfo.currentSASMode;
         }
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("SAS_MODE_INFO_MESSAGE processed at Arduino...");
         break;
 	//Fuel Messages
-    case LF_STAGE_MESSAGE:
-		mySimpit.printToKSP("LF_STAGE_MESSAGE received at Arduino...");
+    case LF_MESSAGE:
+		mySimpit.printToKSP("LF_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
-            resourceMessage liquidFuelSInfo;
-            liquidFuelSInfo = parseMessage<resourceMessage>(msg);
-			VData.liquidFuelSAvailable = liquidFuelSInfo.available;
-			VData.liquidFuelSTotal = liquidFuelSInfo.total;
+            resourceMessage liquidFuelInfo;
+            liquidFuelInfo = parseMessage<resourceMessage>(msg);
+			VData.LiquidFuel = liquidFuelInfo.available;
+			VData.LiquidFuelTot = liquidFuelInfo.total;
         }
-		mySimpit.printToKSP("LF_STAGE_MESSAGE processed at Arduino...");
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+		mySimpit.printToKSP("LF_MESSAGE processed at Arduino...");
         break;
-    case SF_STAGE_MESSAGE:
-		mySimpit.printToKSP("SF_STAGE_MESSAGE received at Arduino...");
+    case SF_MESSAGE:
+		mySimpit.printToKSP("SF_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
-            resourceMessage solidFuelSInfo;
-            solidFuelSInfo = parseMessage<resourceMessage>(msg);
-			VData.solidFuelSAvailable = solidFuelSInfo.available;
-			VData.solidFuelSTotal = solidFuelSInfo.total;
+            resourceMessage solidFuelInfo;
+            solidFuelInfo = parseMessage<resourceMessage>(msg);
+			VData.SolidFuel = solidFuelInfo.available;
+			VData.SolidFuelTot = solidFuelInfo.total;
         }
-		mySimpit.printToKSP("SF_STAGE_MESSAGE processed at Arduino...");
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+		mySimpit.printToKSP("SF_MESSAGE processed at Arduino...");
         break;
-    case OX_STAGE_MESSAGE:
-		mySimpit.printToKSP("OX_STAGE_MESSAGE received at Arduino...");
+    case OX_MESSAGE:
+		mySimpit.printToKSP("OX_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
-            resourceMessage oxidizerSInfo;
-            oxidizerSInfo = parseMessage<resourceMessage>(msg);
-			VData.oxidizerSAvailable = oxidizerSInfo.available;
-			VData.oxidizerSTotal = oxidizerSInfo.total;
+            resourceMessage oxidizerInfo;
+            oxidizerInfo = parseMessage<resourceMessage>(msg);
+			VData.Oxidizer = oxidizerInfo.available;
+			VData.OxidizerTot = oxidizerInfo.total;
         }
-		mySimpit.printToKSP("OX_STAGE_MESSAGE processed at Arduino...");
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+		mySimpit.printToKSP("OX_MESSAGE processed at Arduino...");
         break;
     case ELECTRIC_MESSAGE:
 		mySimpit.printToKSP("ELECTRIC_MESSAGE received at Arduino...");
@@ -181,6 +190,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.ecAvailable = ecInfo.available;
 			VData.ecTotal = ecInfo.total;
         }
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("ELECTRIC_MESSAGE processed at Arduino...");
         break;
     case MONO_MESSAGE:
@@ -191,17 +201,19 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.monoPropAvailable = monoPropInfo.available;
 			VData.monoPropTotal = monoPropInfo.total;
         }
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("MONO_MESSAGE processed at Arduino...");
         break;
-    case XENON_GAS_STAGE_MESSAGE:
-		mySimpit.printToKSP("XENON_GAS_STAGE_MESSAGE received at Arduino...");
+    case XENON_GAS_MESSAGE:
+		mySimpit.printToKSP("XENON_GAS_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
-            resourceMessage xenonGasSInfo;
-            xenonGasSInfo = parseMessage<resourceMessage>(msg);
-			VData.xenonGasSAvailable = xenonGasSInfo.available;
-			VData.xenonGasSTotal = xenonGasSInfo.total;
+            resourceMessage xenonGasInfo;
+            xenonGasInfo = parseMessage<resourceMessage>(msg);
+			VData.xenonGasAvailable = xenonGasInfo.available;
+			VData.xenonGasTotal = xenonGasInfo.total;
         }
-		mySimpit.printToKSP("XENON_GAS_STAGE_MESSAGE processed at Arduino...");
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+		mySimpit.printToKSP("XENON_GAS_MESSAGE processed at Arduino...");
         break;
     case CUSTOM_RESOURCE_1_MESSAGE:
 		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE received at Arduino...");
@@ -213,6 +225,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.customResource2Available = customResourceInfo.currentResource2;
 			VData.customResource2Total = customResourceInfo.maxResource2;
         }
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE processed at Arduino...");
         break;
     //Altitude Message
@@ -224,6 +237,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Alt= altitudeInfo.sealevel;
 			VData.RAlt = altitudeInfo.surface;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("ALTITUDE_MESSAGE processed at Arduino...");
 		break;
 	//Apoapsis and Periapsis Message
@@ -235,6 +249,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.AP = apsidesInfo.apoapsis;
 			VData.PE = apsidesInfo.periapsis;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("APSIDES_MESSAGE processed at Arduino...");
 		break;
 	//Velocity Message
@@ -247,6 +262,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Vsurf = velocityInfo.surface;
 			VData.VVI = velocityInfo.vertical;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("VELOCITY_MESSAGE processed at Arduino...");
 		break;
 	//Times to apoapsis and periapsis
@@ -258,6 +274,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.TAp = apsidesTimeInfo.apoapsis;
 			VData.TPe = apsidesTimeInfo.periapsis;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("APSIDESTIME_MESSAGE processed at Arduino...");
 		break;
     //Target info message
@@ -273,6 +290,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.TargetPitchV = targetInfo.velocityPitch;
 			VData.TargetHeadingV = targetInfo.velocityHeading;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("TARGETINFO_MESSAGE processed at Arduino...");
 		break;
     //Orbit message
@@ -290,6 +308,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.SemiMajorAxis = orbitInfo.semiMajorAxis;
 			VData.LongAscNode = orbitInfo.longAscendingNode;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("ORBIT_MESSAGE processed at Arduino...");
 		break;
     //Flight status message
@@ -301,6 +320,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.CurrentStage = flightInfo.currentStage;
 			VData.TWI = flightInfo.currentTWIndex;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("FLIGHT_STATUS_MESSAGE processed at Arduino...");
 		break;
 	//Airspeed message
@@ -312,6 +332,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.IAS = airspeedInfo.IAS;
 			VData.MachNumber = airspeedInfo.mach;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("AIRSPEED_MESSAGE processed at Arduino...");
 		break;
 	//Rotation message
@@ -324,6 +345,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Pitch = pointingInfo.pitch;
 			VData.Roll = pointingInfo.roll;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("ROTATION_DATA processed at Arduino...");
 		break;
 	//DeltaV message
@@ -335,6 +357,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.StageDeltaV = deltaVInfo.stageDeltaV;
 			VData.TotalDeltaV = deltaVInfo.totalDeltaV;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("DELTAV_MESSAGE processed at Arduino...");
 		break;
 	//Burn Time message
@@ -346,6 +369,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.BurnTime = burnTInfo.totalBurnTime;
 			VData.BurnTimeS = burnTInfo.stageBurnTime;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("BURNTIME_MESSAGE processed at Arduino...");
 		break;
 	//Temperature Limits message
@@ -357,6 +381,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.MaxOverHeat = tempLimitInfo.tempLimitPercentage;
 			VData.MaxSkinOverheat = tempLimitInfo.skinTempLimitPercentage;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("TEMP_LIMIT_MESSAGE processed at Arduino...");
 		break;
 	//Atmospheric conditions message
@@ -367,6 +392,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			atmoInfo = parseMessage<atmoConditionsMessage>(msg);
 			VData.Density = atmoInfo.airDensity;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("ATMO_CONDITIONS_MESSAGE processed at Arduino...");
 		break;
 	//Maneuver message
@@ -380,12 +406,14 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.MNDuration = maneuverInfo.durationNextManeuver;
 			VData.MNDeltaVTotal = maneuverInfo.deltaVTotal;
 		}
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("MANEUVER_MESSAGE processed at Arduino...");
 		break;
 	//SOI message
 	case SOI_MESSAGE:
 		mySimpit.printToKSP("SOI_MESSAGE received at Arduino...");
 		VData.SOI = msg[0];
+		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("SOI_MESSAGE processed at Arduino...");
 		break;
     }
@@ -397,7 +425,7 @@ void define_vessel_data_display() {
 
 	//Fuel LED bar charts - NEED TO USE A SHIFT REGISTER to drive the LED bar charts!
 	// to be implemented
-
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	//LCD Display Modes
 	// 0 xyz TakeOff Mode:     Suface Velocity / Acceleration (G)
 	// 1 Xyz Orbit Mode:       Apoapsis + Time to Apoapsis / Periapsis + Time to Periapsis
@@ -453,6 +481,8 @@ void define_vessel_data_display() {
 		mySimpit.printToKSP("Speed calculations done at Arduino...");
 	}
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+
 	if (!digitalRead(pLCDx) && digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 1: Orbit Mode
 		clearLCD();
@@ -507,6 +537,7 @@ void define_vessel_data_display() {
 		writeLCD(bufferPE);
 	}
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	if (digitalRead(pLCDx) && !digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 2: Maneuver Mode
@@ -527,6 +558,8 @@ void define_vessel_data_display() {
 		writeLCD(bufferMNDeltaV);
 	}
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+
 	if (!digitalRead(pLCDx) && !digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 3: Rendezvouz Mode
 		//Target Distance
@@ -546,6 +579,8 @@ void define_vessel_data_display() {
 		strTargetV.toCharArray(bufferTargetV, 17);
 		writeLCD(bufferTargetV);
 	}
+
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	if (digitalRead(pLCDx) && digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 4: Re-Entry Mode
@@ -590,6 +625,8 @@ void define_vessel_data_display() {
 		writeLCD(bufferRAlt);
 	}
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+
 	if (!digitalRead(pLCDx) && digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 5: Flying Mode
 		//Alt
@@ -608,6 +645,8 @@ void define_vessel_data_display() {
 		strMach.toCharArray(bufferMachNumber, 17);
 		writeLCD(bufferMachNumber);
 	}
+
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	if (digitalRead(pLCDx) && !digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 6: Landing Mode
@@ -629,11 +668,15 @@ void define_vessel_data_display() {
 		writeLCD(bufferVVI);
 	}
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+
 	if (!digitalRead(pLCDx) && !digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 7: Extra Mode
 		clearLCD();
 		writeLCD("KerbalController");
 	}
+
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//get in-game status for updating the LED statuses on the controller  
 	//lights_on = ControlStatus(AGLight);
@@ -667,18 +710,20 @@ void define_vessel_data_display() {
 	digitalWrite(pSASONLED, sas_led_on);
 	digitalWrite(pRCSONLED, rcs_led_on);
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+
 	//Fuel Gauges
-	if (VData.solidFuelSAvailable != 0)
+	if (VData.SolidFuel != 0)
 	{
-		vSF = 100 * VData.solidFuelSAvailable / VData.solidFuelSTotal; //percentage of solid fuel remaining
+		vSF = 100 * VData.SolidFuel / VData.SolidFuelTot; //percentage of solid fuel remaining
 	}
 	else { vSF = 0; }
-	if (VData.liquidFuelSTotal != 0) {
-		vLF = 100 * VData.liquidFuelSAvailable / VData.liquidFuelSTotal; //percentage of liquid fuel remaining in current stage
+	if (VData.LiquidFuelTot != 0) {
+		vLF = 100 * VData.LiquidFuel / VData.LiquidFuelTot; //percentage of liquid fuel remaining in current stage
 	}
 	else { vLF = 0; }
-	if (VData.oxidizerSTotal != 0) {
-		vOX = 100 * VData.oxidizerSAvailable / VData.oxidizerSTotal; //percentage of oxidized remaining in current stage
+	if (VData.OxidizerTot != 0) {
+		vOX = 100 * VData.Oxidizer / VData.OxidizerTot; //percentage of oxidized remaining in current stage
 	}
 	else { vOX = 0; }
 	if (VData.ecTotal != 0) {
@@ -689,8 +734,8 @@ void define_vessel_data_display() {
 		vMP = 100 * VData.monoPropAvailable / VData.monoPropTotal; //percentage of monopropellant remaining
 	}
 	else { vMP = 0; }
-	if (VData.xenonGasSTotal != 0) {
-		vXE = 100 * VData.xenonGasSAvailable / VData.xenonGasSTotal; //percentage of Xenon Gas remaining
+	if (VData.xenonGasTotal != 0) {
+		vXE = 100 * VData.xenonGasAvailable / VData.xenonGasTotal; //percentage of Xenon Gas remaining
 	}
 	else { vXE = 0; }
 	if (VData.customResource1Total != 0) {
@@ -703,6 +748,8 @@ void define_vessel_data_display() {
 	else { vXX = 0; }
 	mySimpit.printToKSP("Fuel calculations done at Arduino");
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+
 	//scale down to 0-9 for binary calculations
 	SF = constrain(map(vSF, 100, 0, 0, 9), 0, 9);
 	LF = constrain(map(vLF, 100, 0, 0, 9), 0, 9);
@@ -712,6 +759,8 @@ void define_vessel_data_display() {
 	XE = constrain(map(vXE, 100, 0, 0, 9), 0, 9);
 	LI = constrain(map(vLI, 100, 0, 0, 9), 0, 9);
 	XX = constrain(map(vXX, 100, 0, 0, 9), 0, 9);
+
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//calculate the power of 2. Now each value in binary is all zeroes and a single 1. we can use that to light one LED in each LED bar (dot mode)
 	int powOX = 0.1 + pow(2, OX);
@@ -723,28 +772,32 @@ void define_vessel_data_display() {
 	int powLI = 0.1 + pow(2, LI);
 	int powXX = 0.1 + pow(2, XX);
 
-	mySimpit.printToKSP("Arduino SF Fuel at: " + powSF);
-	mySimpit.printToKSP("Arduino LF Fuel at: " + powLF);
-	mySimpit.printToKSP("Arduino OX Fuel at: " + powOX);
-	mySimpit.printToKSP("Arduino MP Fuel at: " + powMP);
-	mySimpit.printToKSP("Arduino EL Fuel at: " + powEL);
-	mySimpit.printToKSP("Arduino XE Fuel at: " + powXE);
-	mySimpit.printToKSP("Arduino LI Fuel at: " + powLI);
-	mySimpit.printToKSP("Arduino XX Fuel at: " + powXX);
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
+	mySimpit.printToKSP((String)"Arduino SF Fuel at: " + powSF);
+	mySimpit.printToKSP((String)"Arduino LF Fuel at: " + powLF);
+	mySimpit.printToKSP((String)"Arduino OX Fuel at: " + powOX);
+	mySimpit.printToKSP((String)"Arduino MP Fuel at: " + powMP);
+	mySimpit.printToKSP((String)"Arduino EL Fuel at: " + powEL);
+	mySimpit.printToKSP((String)"Arduino XE Fuel at: " + powXE);
+	mySimpit.printToKSP((String)"Arduino LI Fuel at: " + powLI);
+	mySimpit.printToKSP((String)"Arduino XX Fuel at: " + powXX);
+
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//map the 8-bit 595 shift registers to the 10-bit LED bars, specific to the way I wired them
-	inputBytes[0] = powXX;
-	inputBytes[1] = (powLI << 2) | (powXX >> 8);
-	inputBytes[2] = (powXE << 4) | (powLI >> 6);
-	inputBytes[3] = (powEL << 6) | (powXE >> 4);
-	inputBytes[4] = powEL >> 2;
-	inputBytes[5] = powMP;
-	inputBytes[6] = (powOX << 2) | (powMP >> 8);
-	inputBytes[7] = (powLF << 4) | (powOX >> 6);
-	inputBytes[8] = (powSF << 6) | (powLF >> 4);
-	inputBytes[9] = powSF >> 2;
+	inputBytes[0] = powSF >> 2;
+	inputBytes[1] = (powSF << 6) | (powLF >> 4);
+	inputBytes[2] = (powLF << 4) | (powOX >> 6);
+	inputBytes[3] = (powOX << 2) | (powMP >> 8);
+	inputBytes[4] = powMP;
+	inputBytes[5] = powEL >> 2;
+	inputBytes[6] = (powEL << 6) | (powXE >> 4);
+	inputBytes[7] = (powXE << 4) | (powLI >> 6);
+	inputBytes[8] = (powLI << 2) | (powXX >> 8);
+	inputBytes[9] = powXX;
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//prepare the shift register
 	digitalWrite(dataPin, LOW);
@@ -761,6 +814,7 @@ void define_vessel_data_display() {
 	//latch the values in when done shifting
 	digitalWrite(latchPin, HIGH);
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	mySimpit.printToKSP("Fuel display calculations done at Arduino");
 
 	//Prepare to light up corresponding SAS LED
@@ -810,7 +864,8 @@ void define_vessel_data_display() {
 		sasInputBytes[1] = B00000000;
 		break;
 	}
-	
+
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//prepare the SAS LEDs shift register
 	digitalWrite(sasLEDLatch, LOW);
@@ -824,13 +879,17 @@ void define_vessel_data_display() {
 		shiftOut(sasLEDData, sasLEDClock, MSBFIRST, sasInputByte);
 	}
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+
 	//latch the values in when done shifting
 	digitalWrite(sasLEDLatch, HIGH);
 
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	mySimpit.printToKSP("SAS display calculations done at Arduino");
 }
 
 int get_vessel_data() {
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	define_vessel_data_display();
 	int returnValue = 0;
 	return returnValue;
