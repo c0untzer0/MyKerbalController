@@ -93,26 +93,22 @@ void check_rotary() {
 	//Each stop in the encoder is two steps
 	if ((sasPreviousCLK == 1) && (sasPreviousDATA == 1)) {
 		if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
-			mySimpit.printToKSP("SAS Rotary movement CW");
-			temp_sas_mode++;
-			rotary_helper(true);
-		}
-		else if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
-			mySimpit.printToKSP("SAS Rotary movement CCW");
 			temp_sas_mode--;
 			rotary_helper(false);
+		}
+		else if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
+			temp_sas_mode++;
+			rotary_helper(true);
 		}
 	}
 	else if ((sasPreviousCLK == 0) && (sasPreviousDATA == 0)) {
 		if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
-			mySimpit.printToKSP("SAS Rotary movement CW");
-			temp_sas_mode++;
-			rotary_helper(true);
-		}
-		else if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
-			mySimpit.printToKSP("SAS Rotary movement CCW");
 			temp_sas_mode--;
 			rotary_helper(false);
+		}
+		else if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
+			temp_sas_mode++;
+			rotary_helper(true);
 		}
 	}
 	

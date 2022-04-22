@@ -307,6 +307,9 @@ void setup() {
 
     Serial.begin(115200);  //KSPSerialIO connection
     mySerial.begin(9600); //LCD connection
+    setHighLCDRate();
+    delay(200);
+    mySerial.begin(38400);
     delay(500);           //wait for LCD boot
 
     //write to LCD

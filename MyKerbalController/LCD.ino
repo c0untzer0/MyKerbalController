@@ -1,3 +1,9 @@
+void setHighLCDRate()
+{
+  mySerial.write(0x7C);
+  mySerial.write(0x10);
+}
+
 void jumpToStart()
 {
 	//Jump to the start of the first line on the LCD
@@ -26,4 +32,3 @@ void writeLCD(char myText[])
 	//Write text to the LCD
 	mySerial.write(myText);
 }
-
