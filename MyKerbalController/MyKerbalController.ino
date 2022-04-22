@@ -8,6 +8,7 @@
 #include <SoftwareSerial.h>
 #include <KerbalSimpit.h>
 #include <avr/wdt.h>
+#include <RotaryEncoder.h>
 
 SoftwareSerial mySerial(15, 14); //Pin 14 connected to LCD, 15 unconnected
 
@@ -152,7 +153,7 @@ byte cameraMode;
 //int target_mode;
 int sas_mode = 255;
 int prev_sas_mode = 255;
-bool sas_is_on = true;
+bool sas_is_on = false;
 bool rcs_is_on = false;
 
 //Store old Throttle and joysticks values to avoid sending unnecessary data
@@ -161,8 +162,11 @@ int16_t old_throttle;
 //SAS rotary encoder variables
 int sasPreviousCLK;
 int sasPreviousDATA;
+int sasCurrentCLK;
 long sasTimeOfLastDebounce = 0;
-int sasDelayofDebounce = 0.01;
+int sasDelayofDebounce = 10;
+bool sas_target_set = false;
+bool sas_maneuver_set = false;
 
 //SAS LEDs variable
 byte sasInputBytes[2];
@@ -280,6 +284,12 @@ const int abortLedBlinkTime = 500;  //blink abort LED when armed every 500 ms
 unsigned long deadtime, deadtimeOld, controlTime, controlTimeOld, stageLedTime, stageLedTimeOld, abortLedTime, abortLedTimeOld;
 unsigned long now;
 
+#define ROTARYSTEPS 1
+#define ROTARYMIN 0
+#define ROTARYMAX 9
+RotaryEncoder sasEncoder(sasClockPin, sasDataPin, RotaryEncoder::LatchMode::TWO03);
+int lastSASPos = -1;
+
 // the following variables are unsigned long's because the time, measured
 // in miliseconds, will quickly become a bigger number than can be stored
 // in an int.
@@ -316,6 +326,9 @@ void setup() {
     controlsInit();   //set all pin modes and rotation of sas rotary switch
     testLEDS(100);     //blink every LED once to test (with a delay of 100 ms)
 
+    //sasCurrentCLK = digitalRead(sasClockPin);
+    sasEncoder.setPosition(0 / ROTARYSTEPS);
+
     //Check initial debug mode
     if (!digitalRead(pMODE)) { debug = true; }
     else
@@ -335,7 +348,7 @@ void setup() {
         }
         serial_initialized = true;
         //InitTxPackets();  //initialize the serial communication
-
+        
         // Sets our callback function. The KerbalSimpit library will
         // call this function every time a packet is received.
         mySimpit.inboundHandler(messageHandler);
@@ -622,4 +635,3 @@ void loop() {
         check_and_send_data();
     }
 }
-
