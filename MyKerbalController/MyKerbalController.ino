@@ -8,7 +8,6 @@
 #include <SoftwareSerial.h>
 #include <KerbalSimpit.h>
 #include <avr/wdt.h>
-#include <RotaryEncoder.h>
 
 SoftwareSerial mySerial(15, 14); //Pin 14 connected to LCD, 15 unconnected
 
@@ -151,7 +150,7 @@ byte cameraMode;
 
 //SAS mode variables
 //int target_mode;
-int temp_sas_mode;
+int temp_sas_mode = 255;
 int sas_mode = 255;
 int prev_sas_mode = 255;
 bool sas_is_on = false;
@@ -165,7 +164,7 @@ int sasPreviousCLK;
 int sasPreviousDATA;
 int sasCurrentCLK;
 long sasTimeOfLastDebounce = 0;
-int sasDelayofDebounce = 10;
+int sasDelayofDebounce = 30;
 bool sas_target_set = false;
 bool sas_maneuver_set = false;
 
@@ -285,11 +284,6 @@ const int abortLedBlinkTime = 500;  //blink abort LED when armed every 500 ms
 unsigned long deadtime, deadtimeOld, controlTime, controlTimeOld, stageLedTime, stageLedTimeOld, abortLedTime, abortLedTimeOld;
 unsigned long now;
 
-#define ROTARYSTEPS 1
-#define ROTARYMIN 0
-#define ROTARYMAX 9
-RotaryEncoder sasEncoder(sasClockPin, sasDataPin, RotaryEncoder::LatchMode::TWO03);
-int lastSASPos = -1;
 
 // the following variables are unsigned long's because the time, measured
 // in miliseconds, will quickly become a bigger number than can be stored
@@ -304,7 +298,6 @@ int lastSASPos = -1;
 KerbalSimpit mySimpit(Serial);
 
 void reboot() {
-    mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
     wdt_disable();
     wdt_enable(WDTO_15MS);
     while (1) {}
@@ -327,8 +320,8 @@ void setup() {
     controlsInit();   //set all pin modes and rotation of sas rotary switch
     testLEDS(100);     //blink every LED once to test (with a delay of 100 ms)
 
-    //sasCurrentCLK = digitalRead(sasClockPin);
-    sasEncoder.setPosition(0 / ROTARYSTEPS);
+    sasPreviousCLK = digitalRead(sasClockPin);
+    sasPreviousDATA = digitalRead(sasDataPin);
 
     //Check initial debug mode
     if (!digitalRead(pMODE)) { debug = true; }
@@ -358,7 +351,7 @@ void setup() {
         // flight scene is active in-game.
         mySimpit.registerChannel(ACTIONSTATUS_MESSAGE);
         // Send registration for Custom Action Groups
-        //mySimpit.registerChannel(CAGSTATUS_MESSAGE);
+        mySimpit.registerChannel(CAGSTATUS_MESSAGE);
         // Send registration for SAS Info
         mySimpit.registerChannel(SAS_MODE_INFO_MESSAGE);
         // Send registration for Fuel types
@@ -626,12 +619,9 @@ void loop() {
     else {
 
         //KSP mode
-        mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         //Send and Receive data
         mySimpit.update();
-        mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-        //get_vessel_data();
-        mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+        get_vessel_data();
         //send_control_data();
         check_and_send_data();
     }

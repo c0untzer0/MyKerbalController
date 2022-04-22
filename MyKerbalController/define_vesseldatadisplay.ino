@@ -16,7 +16,6 @@
 
 //Message Handler function
 void messageHandler(byte messageType, byte msg[], byte msgSize) {
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	byte currentActionStatus;
     switch (messageType) {
 	//Action Groups Messages
@@ -61,7 +60,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 				rcs_is_on = false;
             }
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         break;
 	//Custom Action Group Messages
     case CAGSTATUS_MESSAGE:
@@ -129,7 +127,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
                 chutes_on = false;
             }
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         break;
 	//SAS Mode Messages
     case SAS_MODE_INFO_MESSAGE:
@@ -138,7 +135,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
             SASModeInfo = parseMessage<SASInfoMessage>(msg);
             sas_mode = SASModeInfo.currentSASMode;
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         break;
 	//Fuel Messages
     case LF_MESSAGE:
@@ -148,7 +144,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.LiquidFuel = liquidFuelInfo.available;
 			VData.LiquidFuelTot = liquidFuelInfo.total;
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         break;
     case SF_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
@@ -157,7 +152,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.SolidFuel = solidFuelInfo.available;
 			VData.SolidFuelTot = solidFuelInfo.total;
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         break;
     case OX_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
@@ -166,7 +160,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Oxidizer = oxidizerInfo.available;
 			VData.OxidizerTot = oxidizerInfo.total;
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         break;
     case ELECTRIC_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
@@ -175,7 +168,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.ecAvailable = ecInfo.available;
 			VData.ecTotal = ecInfo.total;
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         break;
     case MONO_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
@@ -184,7 +176,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.monoPropAvailable = monoPropInfo.available;
 			VData.monoPropTotal = monoPropInfo.total;
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         break;
     case XENON_GAS_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
@@ -193,7 +184,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.xenonGasAvailable = xenonGasInfo.available;
 			VData.xenonGasTotal = xenonGasInfo.total;
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         break;
 	/* Economizing subscriptions
     case CUSTOM_RESOURCE_1_MESSAGE:
@@ -218,7 +208,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Alt= altitudeInfo.sealevel;
 			VData.RAlt = altitudeInfo.surface;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	//Apoapsis and Periapsis Message
 	case APSIDES_MESSAGE:
@@ -228,7 +217,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.AP = apsidesInfo.apoapsis;
 			VData.PE = apsidesInfo.periapsis;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	//Velocity Message
 	case VELOCITY_MESSAGE:
@@ -239,7 +227,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Vsurf = velocityInfo.surface;
 			VData.VVI = velocityInfo.vertical;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	//Times to apoapsis and periapsis
     case APSIDESTIME_MESSAGE:
@@ -249,7 +236,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.TAp = apsidesTimeInfo.apoapsis;
 			VData.TPe = apsidesTimeInfo.periapsis;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	/* Economizing subscriptions
     //Target info message
@@ -283,7 +269,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.SemiMajorAxis = orbitInfo.semiMajorAxis;
 			VData.LongAscNode = orbitInfo.longAscendingNode;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	/* Economizing subscriptions
     //Flight status message
@@ -307,7 +292,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.IAS = airspeedInfo.IAS;
 			VData.MachNumber = airspeedInfo.mach;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	//Rotation message
 	case ROTATION_DATA:
@@ -318,7 +302,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Pitch = pointingInfo.pitch;
 			VData.Roll = pointingInfo.roll;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	//DeltaV message
 	case DELTAV_MESSAGE:
@@ -328,7 +311,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.StageDeltaV = deltaVInfo.stageDeltaV;
 			VData.TotalDeltaV = deltaVInfo.totalDeltaV;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	//Burn Time message
 	case BURNTIME_MESSAGE:
@@ -338,7 +320,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.BurnTime = burnTInfo.totalBurnTime;
 			VData.BurnTimeS = burnTInfo.stageBurnTime;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	//Temperature Limits message
 	case TEMP_LIMIT_MESSAGE:
@@ -348,7 +329,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.MaxOverHeat = tempLimitInfo.tempLimitPercentage;
 			VData.MaxSkinOverheat = tempLimitInfo.skinTempLimitPercentage;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	//Atmospheric conditions message
 	case ATMO_CONDITIONS_MESSAGE:
@@ -357,7 +337,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			atmoInfo = parseMessage<atmoConditionsMessage>(msg);
 			VData.Density = atmoInfo.airDensity;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	//Maneuver message
 	case MANEUVER_MESSAGE:
@@ -369,7 +348,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.MNDuration = maneuverInfo.durationNextManeuver;
 			VData.MNDeltaVTotal = maneuverInfo.deltaVTotal;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		break;
 	/* Economizing subscriptions
 	//SOI message
@@ -389,7 +367,7 @@ void define_vessel_data_display() {
 
 	//Fuel LED bar charts - NEED TO USE A SHIFT REGISTER to drive the LED bar charts!
 	// to be implemented
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+	//mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	//LCD Display Modes
 	// 0 xyz TakeOff Mode:     Suface Velocity / Acceleration (G)
 	// 1 Xyz Orbit Mode:       Apoapsis + Time to Apoapsis / Periapsis + Time to Periapsis
@@ -399,6 +377,8 @@ void define_vessel_data_display() {
 	// 5 XyZ Flying Mode:      Altitude / Mach number
 	// 6 xYZ Landing Mode:     Radar Altitude / Vertical Velocity
 	// 7 XYZ Extra Mode:       Not implemented yet. Possibly DeltaV left on Vessel / Total Burn Time?  
+
+	/*Shut down code party for testing
 
 	if (digitalRead(pLCDx) && digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 0 : TakeOff Mode
@@ -410,16 +390,16 @@ void define_vessel_data_display() {
 		strVsurf += " m/s";
 		strVsurf.toCharArray(bufferVsurf, 17);
 		writeLCD(bufferVsurf);
-		/* Unable to display acceleration for now, as KSimpit does not provide it
-		//Acceleration (G)
-		jumpToLineTwo();
-		char bufferGee[17];
-		String strGee = "Accel: ";
-		strGee += String(VData.G, 0);
-		strGee += " G";
-		strGee.toCharArray(bufferGee, 17);
-		writeLCD(bufferGee);
-		*/
+		// Unable to display acceleration for now, as KSimpit does not provide it
+		////Acceleration (G)
+		//jumpToLineTwo();
+		//char bufferGee[17];
+		//String strGee = "Accel: ";
+		//strGee += String(VData.G, 0);
+		//strGee += " G";
+		//strGee.toCharArray(bufferGee, 17);
+		//writeLCD(bufferGee);
+		
 		//Radar Altitude (m)
 		jumpToLineTwo();
 		char bufferRAlt[17];
@@ -555,16 +535,16 @@ void define_vessel_data_display() {
 		writeLCD("Heat: ");
 		writeLCD(t);
 		writeLCD("%");
-		/* Unable to display acceleration for now, as KSimpit does not provide it
-		//Acceleration (G)
-		jumpToLineTwo();
-		char bufferGee[17];
-		String strGee = "Decel: ";
-		strGee += String(VData.G, 0);
-		strGee += " G";
-		strGee.toCharArray(bufferGee, 17);
-		writeLCD(bufferGee);
-		*/
+		// Unable to display acceleration for now, as KSimpit does not provide it
+		////Acceleration (G)
+		//jumpToLineTwo();
+		//char bufferGee[17];
+		//String strGee = "Decel: ";
+		//strGee += String(VData.G, 0);
+		//strGee += " G";
+		//strGee.toCharArray(bufferGee, 17);
+		//writeLCD(bufferGee);
+		
 		//Radar Altitude (m)
 		jumpToLineTwo();
 		char bufferRAlt[17];
@@ -639,8 +619,8 @@ void define_vessel_data_display() {
 		clearLCD();
 		writeLCD("KerbalController");
 	}
+	*/
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//get in-game status for updating the LED statuses on the controller  
 	//lights_on = ControlStatus(AGLight);
@@ -674,7 +654,6 @@ void define_vessel_data_display() {
 	digitalWrite(pSASONLED, sas_led_on);
 	digitalWrite(pRCSONLED, rcs_led_on);
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//Fuel Gauges
 	if (VData.SolidFuel != 0)
@@ -711,7 +690,6 @@ void define_vessel_data_display() {
 	}
 	else { vXX = 0; }
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//scale down to 0-9 for binary calculations
 	SF = constrain(map(vSF, 100, 0, 0, 9), 0, 9);
@@ -723,7 +701,6 @@ void define_vessel_data_display() {
 	LI = constrain(map(vLI, 100, 0, 0, 9), 0, 9);
 	XX = constrain(map(vXX, 100, 0, 0, 9), 0, 9);
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//calculate the power of 2. Now each value in binary is all zeroes and a single 1. we can use that to light one LED in each LED bar (dot mode)
 	int powOX = 0.1 + pow(2, OX);
@@ -735,7 +712,6 @@ void define_vessel_data_display() {
 	int powLI = 0.1 + pow(2, LI);
 	int powXX = 0.1 + pow(2, XX);
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//map the 8-bit 595 shift registers to the 10-bit LED bars, specific to the way I wired them
 	inputBytes[0] = powSF >> 2;
@@ -749,7 +725,6 @@ void define_vessel_data_display() {
 	inputBytes[8] = (powLI << 2) | (powXX >> 8);
 	inputBytes[9] = powXX;
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//prepare the shift register
 	digitalWrite(dataPin, LOW);
@@ -766,7 +741,6 @@ void define_vessel_data_display() {
 	//latch the values in when done shifting
 	digitalWrite(latchPin, HIGH);
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//Prepare to light up corresponding SAS LED
 	switch (temp_sas_mode) {
@@ -775,48 +749,47 @@ void define_vessel_data_display() {
 		sasInputBytes[1] = B00000000;
 		break;
 	case SMSAS:
-		sasInputBytes[0] = B00100000;
-		sasInputBytes[1] = B00000000;
+		sasInputBytes[0] = B00000000;
+		sasInputBytes[1] = B00100000;
 		break;
 	case SMPrograde:
-		sasInputBytes[0] = B01000000;
-		sasInputBytes[1] = B00000000;
+		sasInputBytes[0] = B00000000;
+		sasInputBytes[1] = B01000000;
 		break;
 	case SMRetroGrade:
-		sasInputBytes[0] = B00000010;
-		sasInputBytes[1] = B00000000;
-		break;
-	case SMNormal:
-		sasInputBytes[0] = B10000000;
-		sasInputBytes[1] = B00000000;
-		break;
-	case SMAntinormal:
-		sasInputBytes[0] = B00000100;
-		sasInputBytes[1] = B00000000;
-		break;
-	case SMRadialIn:
-		sasInputBytes[0] = B00000000;
-		sasInputBytes[1] = B00000001;
-		break;
-	case SMRadialOut:
-		sasInputBytes[0] = B00001000;
-		sasInputBytes[1] = B00000000;
-		break;
-	case SMTarget:
 		sasInputBytes[0] = B00000000;
 		sasInputBytes[1] = B00000010;
 		break;
-	case SMAntiTarget:
-		sasInputBytes[0] = B00010000;
-		sasInputBytes[1] = B00000000;
+	case SMNormal:
+		sasInputBytes[0] = B00000000;
+		sasInputBytes[1] = B10000000;
 		break;
-	case SMManeuverNode:
+	case SMAntinormal:
+		sasInputBytes[0] = B00000000;
+		sasInputBytes[1] = B00000100;
+		break;
+	case SMRadialIn:
 		sasInputBytes[0] = B00000001;
 		sasInputBytes[1] = B00000000;
 		break;
+	case SMRadialOut:
+		sasInputBytes[0] = B00000000;
+		sasInputBytes[1] = B00001000;
+		break;
+	case SMTarget:
+		sasInputBytes[0] = B00000010;
+		sasInputBytes[1] = B00000000;
+		break;
+	case SMAntiTarget:
+		sasInputBytes[0] = B00000000;
+		sasInputBytes[1] = B00010000;
+		break;
+	case SMManeuverNode:
+		sasInputBytes[0] = B00000000;
+		sasInputBytes[1] = B00000001;
+		break;
 	}
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//prepare the SAS LEDs shift register
 	digitalWrite(sasLEDLatch, LOW);
@@ -830,16 +803,13 @@ void define_vessel_data_display() {
 		shiftOut(sasLEDData, sasLEDClock, MSBFIRST, sasInputByte);
 	}
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//latch the values in when done shifting
 	digitalWrite(sasLEDLatch, HIGH);
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 }
 
 int get_vessel_data() {
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	define_vessel_data_display();
 	int returnValue = 0;
 	return returnValue;

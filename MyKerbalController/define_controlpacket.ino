@@ -1,43 +1,139 @@
 //Define what controls to send to KSP
 
+void rotary_helper(bool clockwise)
+{
+	if (clockwise)
+	{
+		if (temp_sas_mode > 9) { temp_sas_mode = 0; }
+		if ((temp_sas_mode == 7 || temp_sas_mode == 8) && (!sas_target_set))
+		{
+			temp_sas_mode = 9;
+		}
+		if ((temp_sas_mode == 9) && !sas_maneuver_set) { temp_sas_mode = 0; }
+	}
+	else
+	{
+		if (temp_sas_mode < 0) { temp_sas_mode = 9; }
+		if ((temp_sas_mode == 9) && !sas_maneuver_set) { temp_sas_mode = 8; }
+		if ((temp_sas_mode == 7 || temp_sas_mode == 8) && (!sas_target_set))
+		{
+			temp_sas_mode = 6;
+		}
+	}
+}
+
+
+void check_rotary() {
+	sasCurrentCLK = digitalRead(sasClockPin);
+
+	/*
+	if (sasCurrentCLK != sasPreviousCLK)
+	{
+		if (digitalRead(sasDataPin) != sasCurrentCLK) {
+			temp_sas_mode++;
+			mySimpit.printToKSP("SAS Rotary movement CW");
+			rotary_helper(true);
+		}
+		else
+		{
+			temp_sas_mode--;
+			mySimpit.printToKSP("SAS Rotary movement CCW");
+			rotary_helper(false);
+		}
+	}
+	*/
+
+	/*
+	if ((sasPreviousCLK == 0) && (sasPreviousDATA == 1)) {
+		if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
+			mySimpit.printToKSP("SAS Rotary movement CW");
+			temp_sas_mode++;
+			rotary_helper(true);
+		}
+		else if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
+			mySimpit.printToKSP("SAS Rotary movement CCW");
+			temp_sas_mode--;
+			rotary_helper(false);
+		}
+	} else if ((sasPreviousCLK == 1) && (sasPreviousDATA == 0)) {
+		if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
+			mySimpit.printToKSP("SAS Rotary movement CW");
+			temp_sas_mode++;
+			rotary_helper(true);
+		}
+		else if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
+			mySimpit.printToKSP("SAS Rotary movement CCW");
+			temp_sas_mode--;
+			rotary_helper(false);
+		}
+	} else if ((sasPreviousCLK == 1) && (sasPreviousDATA == 1)) {
+		if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
+			mySimpit.printToKSP("SAS Rotary movement CW");
+			temp_sas_mode++;
+			rotary_helper(true);
+		}
+		else if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
+			mySimpit.printToKSP("SAS Rotary movement CCW");
+			temp_sas_mode--;
+			rotary_helper(false);
+		}
+	} else if ((sasPreviousCLK == 0) && (sasPreviousDATA == 0)) {
+		if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
+			mySimpit.printToKSP("SAS Rotary movement CW");
+			temp_sas_mode++;
+			rotary_helper(true);
+		}
+		else if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
+			mySimpit.printToKSP("SAS Rotary movement CCW");
+			temp_sas_mode--;
+			rotary_helper(false);
+		}
+	}
+	*/
+	//Each stop in the encoder is two steps
+	if ((sasPreviousCLK == 1) && (sasPreviousDATA == 1)) {
+		if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
+			mySimpit.printToKSP("SAS Rotary movement CW");
+			temp_sas_mode++;
+			rotary_helper(true);
+		}
+		else if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
+			mySimpit.printToKSP("SAS Rotary movement CCW");
+			temp_sas_mode--;
+			rotary_helper(false);
+		}
+	}
+	else if ((sasPreviousCLK == 0) && (sasPreviousDATA == 0)) {
+		if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
+			mySimpit.printToKSP("SAS Rotary movement CW");
+			temp_sas_mode++;
+			rotary_helper(true);
+		}
+		else if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
+			mySimpit.printToKSP("SAS Rotary movement CCW");
+			temp_sas_mode--;
+			rotary_helper(false);
+		}
+	}
+	
+	
+}
+
 void check_and_send_data() {
 
-	//Check SAS Encoder using RotaryEncoder library
-	sasEncoder.tick();
-	int newPos = sasEncoder.getPosition() * ROTARYSTEPS;
+	//Check SAS Encoder
+	// If enough time has passed check the rotary encoder
+	if (((millis() - sasTimeOfLastDebounce) > sasDelayofDebounce) && sas_is_on) {
 
-	if (newPos < ROTARYMIN) {
-		sasEncoder.setPosition(ROTARYMAX / ROTARYSTEPS);
-		newPos = ROTARYMAX;
+		check_rotary();  // Rotary Encoder check routine below
 
-	}
-	else if (newPos > ROTARYMAX) {
-		sasEncoder.setPosition(ROTARYMIN / ROTARYSTEPS);
-		newPos = ROTARYMIN;
-	}
+		sasPreviousCLK = digitalRead(sasClockPin);
+		sasPreviousDATA = digitalRead(sasDataPin);
 
-	if (lastSASPos != newPos) {
-		if (lastSASPos < newPos)
-		{
-			if ((newPos == 7 || newPos == 8) && (!sas_target_set))
-			{
-				newPos = 9;
-			}
-			if ((newPos == 9) && !sas_maneuver_set) { newPos = 0; }
-		} else
-		{
-			if ((newPos == 9) && !sas_maneuver_set) { newPos = 8; }
-			if ((newPos == 7 || newPos == 8) && (!sas_target_set))
-			{
-				newPos = 6;
-			}
-		}
-		temp_sas_mode = newPos;
-		lastSASPos = newPos;
+		sasTimeOfLastDebounce = millis();  // Set variable to current millis() timer
 	}
 
 	//here we define what controls to send when which pins are manipulated
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	//First, update all temporary switches using Bounce2
 	b_TB.update();
 	b_RB.update();
@@ -65,11 +161,13 @@ void check_and_send_data() {
 		mySimpit.activateAction(SAS_ACTION);
 		sas_led_on = true;
 		sas_is_on = true;
+		temp_sas_mode = 0;
 	}
 	else if (!digitalRead(pSAS) && sas_is_on) {
 		mySimpit.deactivateAction(SAS_ACTION);
 		sas_led_on = false;
 		sas_is_on = false;
+		temp_sas_mode = 255;
 	}
 	if (digitalRead(pRCS) && !rcs_is_on) {
 		mySimpit.activateAction(RCS_ACTION);
@@ -113,7 +211,6 @@ void check_and_send_data() {
 	else { stage_led_on = false; }
 	digitalWrite(pSTAGELED, stage_led_on);
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	//toggle buttons
 	if (b_LIGHTS.pressed()) {
 		mySimpit.toggleAction(LIGHT_ACTION);
@@ -132,7 +229,6 @@ void check_and_send_data() {
 	if (b_SOLAR.pressed()) { mySimpit.toggleCAG(9); }
 	if (b_CHUTES.pressed()) { mySimpit.toggleCAG(10); }
 
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	
 	//throttle
@@ -142,7 +238,6 @@ void check_and_send_data() {
 		mySimpit.send(THROTTLE_MESSAGE, throttle_msg);
 		old_throttle = throttle_msg.throttle;
 	}
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//rotation joystick button toggles flight control modes
 	if (!digitalRead(pRB))
@@ -161,8 +256,8 @@ void check_and_send_data() {
 	int16_t tr_z = 0;
 	if (rb_on) {
 		//rocket mode
-		if (analogRead(pRX) >= 530) { yaw = constrain(map(analogRead(pRX), 530, 1019, 0, INT16_MIN), INT16_MIN, 0); }
-		else if (analogRead(pRX) <= 470) { yaw = constrain(map(analogRead(pRX), 0, 470, INT16_MAX, 0), 0, INT16_MAX); }
+		if (analogRead(pRX) >= 530) { yaw = constrain(map(analogRead(pRX), 550, 1019, 0, INT16_MIN), INT16_MIN, 0); }
+		else if (analogRead(pRX) <= 470) { yaw = constrain(map(analogRead(pRX), 0, 450, INT16_MAX, 0), 0, INT16_MAX); }
 		if (analogRead(pRY) >= 530) { pitch = constrain(map(analogRead(pRY), 530, 1019, 0, INT16_MAX), 0, INT16_MAX); }
 		else if (analogRead(pRY) <= 470) { pitch = constrain(map(analogRead(pRY), 0, 470, INT16_MIN, 0), INT16_MIN, 0); }
 		if (analogRead(pRZ) <= 470) { roll = constrain(map(analogRead(pRZ), 0, 470, INT16_MIN, 0), INT16_MIN, 0); }
@@ -177,8 +272,8 @@ void check_and_send_data() {
 	}
 	else {
 		//airplane mode
-		if (analogRead(pRX) >= 530) { roll = constrain(map(analogRead(pRX), 1019, 530, INT16_MAX, 0), 0, INT16_MAX); }
-		else if (analogRead(pRX) <= 470) { roll = constrain(map(analogRead(pRX), 470, 0, 0, INT16_MIN), INT16_MIN, 0); }
+		if (analogRead(pRX) >= 530) { roll = constrain(map(analogRead(pRX), 1019, 550, INT16_MAX, 0), 0, INT16_MAX); }
+		else if (analogRead(pRX) <= 470) { roll = constrain(map(analogRead(pRX), 450, 0, 0, INT16_MIN), INT16_MIN, 0); }
 		if (analogRead(pRY) >= 530) { pitch = constrain(map(analogRead(pRY), 530, 1019, 0, INT16_MAX), 0, INT16_MAX); }
 		else if (analogRead(pRY) <= 470) { pitch = constrain(map(analogRead(pRY), 0, 470, INT16_MIN, 0), INT16_MIN, 0); }
 		if (analogRead(pTX) >= 530) { yaw = constrain(map(analogRead(pTX), 1019, 530, INT16_MIN, 0), INT16_MIN, 0); }
@@ -203,12 +298,12 @@ void check_and_send_data() {
 
 	//SAS Selector Button sends SAS mode selected
 	if (b_SASBTN.pressed()) {
+  // Eventually change this behavior to a sas setting timer
 		if ((temp_sas_mode != sas_mode) && sas_is_on)
 		{
 			mySimpit.setSASMode(temp_sas_mode);
 		}
 	}
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	/*Changing the behavior of camera switch until I have better integration with API
 	//Toggle switch for selecting camera mode
@@ -223,7 +318,6 @@ void check_and_send_data() {
 	*/
 
 	//Set the View toggle switch actions
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	if (b_CAMMODEUP.pressed())
 	{
 		//Map view toggle if the switch is toggled up
@@ -241,6 +335,5 @@ void check_and_send_data() {
 		}
 		mySimpit.setCameraMode(cameraMode);
 	}
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	
 }
