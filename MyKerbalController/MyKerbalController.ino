@@ -301,7 +301,7 @@ void reboot() {
 
 void setup() {
 
-    Serial.begin(38400);  //KSPSerialIO connection
+    Serial.begin(115200);  //KSPSerialIO connection
     mySerial.begin(9600); //LCD connection
     delay(500);           //wait for LCD boot
 
@@ -529,16 +529,16 @@ void loop() {
         digitalWrite(clockPin, LOW);
         digitalWrite(latchPin, LOW);
 
-        inputBytes[0] = B00000000;
-        inputBytes[1] = B00000000;
-        inputBytes[2] = B00000000;
-        inputBytes[3] = B00000000;
-        inputBytes[4] = B00000000;
-        inputBytes[5] = B00000000;
-        inputBytes[6] = B00000000;
-        inputBytes[7] = B00000000;
-        inputBytes[8] = B00000000;
-        inputBytes[9] = B00000001;
+        inputBytes[0] = B11111111;
+        inputBytes[1] = B11111111;
+        inputBytes[2] = B11111111;
+        inputBytes[3] = B11111111;
+        inputBytes[4] = B11111111;
+        inputBytes[5] = B11111111;
+        inputBytes[6] = B11111111;
+        inputBytes[7] = B11111111;
+        inputBytes[8] = B11111111;
+        inputBytes[9] = B11111111;
         //loop through the input bytes
         for (int j = 0; j <= 9; j++) {
             byte inputByte = inputBytes[j];
@@ -614,10 +614,15 @@ void loop() {
         //KSP mode
         mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         //Send and Receive data
+        Serial.flush();
+
+        mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         mySimpit.update();
+        mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         get_vessel_data();
+        mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         //send_control_data();
-        check_and_send_data();
+        //check_and_send_data();
     }
 }
 

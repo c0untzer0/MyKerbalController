@@ -159,6 +159,8 @@ void check_and_send_data() {
 	if (b_CHUTES.pressed()) { mySimpit.toggleCAG(10); }
 
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+
+	/*
 	//throttle
 	throttleMessage throttle_msg;
 	throttle_msg.throttle = map(analogRead(pTHROTTLE), 30, 990, INT16_MAX, 0);
@@ -174,6 +176,8 @@ void check_and_send_data() {
 	if (!b_RB.pressed() && rb_prev) { rb_prev = false; }
 
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+	*/
+
 	/*
 	//Send Joysticks info
 	rotationMessage rot_msg;
@@ -254,6 +258,7 @@ void check_and_send_data() {
 		}
 		mySimpit.setCameraMode(cameraMode);
 	}
+	mySimpit.printToKSP("SAS button info sent from Arduino...");
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//SAS Selector Rotary Encoder for changing SAS modes
@@ -264,7 +269,8 @@ void check_and_send_data() {
 		sasPreviousDATA = digitalRead(sasDataPin);
 		sasTimeOfLastDebounce = millis();  // Set variable to current millis() timer
 	}
-	mySimpit.printToKSP("SAS button info sent from Arduino...");
+	
+	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	/*Changing the behavior of camera switch until I have better integration with API
 	//Toggle switch for selecting camera mode
 	cameraMode = 0;
@@ -277,7 +283,7 @@ void check_and_send_data() {
 	setCameraMode(cameraMode);
 	*/
 
-	/*
+	/* Debugging
 	//Set the View toggle switch actions
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	if (b_CAMMODEUP.pressed())
