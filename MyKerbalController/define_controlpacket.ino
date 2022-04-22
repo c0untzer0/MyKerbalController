@@ -1,91 +1,5 @@
 //Define what controls to send to KSP
 
-/*
-//Define the SAS Rotary encoder checks and actions
-void check_rotary() {
-	mySimpit.printToKSP((String)"DBG: "+__LINE__+":"+__FUNCTION__);
-
-    int temp_sas_mode = sas_mode;
-
-	sasCurrentCLK = digitalRead(sasClockPin);
-
-	if (sasCurrentCLK != sasPreviousCLK)
-	{
-		if (digitalRead(sasDataPin) != sasCurrentCLK)
-		{
-			temp_sas_mode++;
-			if ((temp_sas_mode == 7 || temp_sas_mode == 8) && (!sas_target_set))
-			{
-				temp_sas_mode = 9;
-			}
-			if ((temp_sas_mode == 9) && !sas_maneuver_set)
-			{
-				temp_sas_mode = 0;
-			}
-		} else
-		{
-			temp_sas_mode--;
-			if ((temp_sas_mode == 9) && !sas_maneuver_set)
-			{
-				temp_sas_mode = 8;
-			}
-			if ((temp_sas_mode == 7 || temp_sas_mode == 8) && (!sas_target_set))
-			{
-				temp_sas_mode = 6;
-			}
-		}
-	}
-	sasPreviousCLK = sasCurrentCLK;
-    //if ((sasPreviousCLK == 0) && (sasPreviousDATA == 1)) {
-    //  if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
-    //    sas_mode ++;
-    //  }
-    //  if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
-    //    sas_mode --;
-    //  }
-    //}
-	//
-    //if ((sasPreviousCLK == 1) && (sasPreviousDATA == 0)) {
-    //  if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
-    //    sas_mode ++;
-    //  }
-    //  if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
-    //    sas_mode --;
-    //  }
-    //}
-	//
-    //if ((sasPreviousCLK == 1) && (sasPreviousDATA == 1)) {
-    //    if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
-    //        temp_sas_mode++;
-    //    }
-    //    if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
-    //        temp_sas_mode--;
-    //    }
-    //}
-	//
-    //if ((sasPreviousCLK == 0) && (sasPreviousDATA == 0)) {
-    //    if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
-    //        temp_sas_mode++;
-    //    }
-    //    if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
-    //        temp_sas_mode--;
-    //    }
-    //}
-	
-    if (temp_sas_mode > 9) {
-        temp_sas_mode = 0;
-    }
-    else if (temp_sas_mode < 0) {
-        temp_sas_mode = 9;
-    }
-    sas_mode = temp_sas_mode;
-	if (sas_mode != prev_sas_mode) { mySimpit.setSASMode(sas_mode); }
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-	mySimpit.printToKSP("SAS mode sent from Arduino...");
-}
-*/
-
-
 void check_and_send_data() {
 
 	//Check SAS Encoder using RotaryEncoder library
@@ -118,7 +32,7 @@ void check_and_send_data() {
 				newPos = 6;
 			}
 		}
-		mySimpit.setSASMode(newPos);
+		temp_sas_mode = newPos;
 		lastSASPos = newPos;
 	}
 
@@ -275,53 +189,27 @@ void check_and_send_data() {
 	mySimpit.send(ROTATION_MESSAGE, rot_msg);
 	mySimpit.send(TRANSLATION_MESSAGE, tra_msg);
 
-	//translation joystick button resets camera view to neutral
+	//translation joystick button switches to next vessel
 	if (b_TB.pressed())
 	{
-		cameraRotationMessage cam_rot;
-		cam_rot.setPitchRollYawZoom(0, 0, 0, 0);
+		//Next vessel switch behavior instead
+		keyboardEmulatorMessage keystroke_down(0xDD);
+		mySimpit.send(KEYBOARD_EMULATOR, keystroke_down);
+		//cameraRotationMessage cam_rot;
+		//cam_rot.setPitchRollYawZoom(0, 0, 0, 0);
+		//mySimpit.send(CAMERA_ROTATION_MESSAGE, cam_rot);
 	}
 
-	/* No Target modes on KSimpit
-	//SAS Selector Button toggles SAS Target modes
-	if (b_SASBTN.pressed() && !sasb_prev) { sasb_on = !sasb_on; sasb_prev = true; }
-	if (!b_SASBTN.pressed() && sasb_prev) { sasb_prev = false; }
-	if (sasb_on) {
-		target_mode = getNavballMode();
-		if (target_mode == 3) {
-			target_mode = 0;
-		}
-		else {
-			target_mode++;
-		}
-		setNavballMode(target_mode);
-	}
-	*/
 
-	//SAS Selector Button cycles camera views
+	//SAS Selector Button sends SAS mode selected
 	if (b_SASBTN.pressed()) {
-		if (cameraMode == 6) {
-			cameraMode = 1;
+		if ((temp_sas_mode != sas_mode) && sas_is_on)
+		{
+			mySimpit.setSASMode(temp_sas_mode);
 		}
-		else {
-			cameraMode++;
-		}
-		mySimpit.setCameraMode(cameraMode);
 	}
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
-	/* Using RotaryEncoder Library
-	//SAS Selector Rotary Encoder for changing SAS modes
-	// If enough time has passed check the rotary encoder
-	if (((millis() - sasTimeOfLastDebounce) > sasDelayofDebounce) && sas_is_on) {
-		check_rotary();  // Rotary Encoder check routine defined above
-		sasPreviousCLK = digitalRead(sasClockPin);
-		sasPreviousDATA = digitalRead(sasDataPin);
-		sasTimeOfLastDebounce = millis();  // Set variable to current millis() timer
-	}
-	*/
-	
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	/*Changing the behavior of camera switch until I have better integration with API
 	//Toggle switch for selecting camera mode
 	cameraMode = 0;
@@ -344,9 +232,14 @@ void check_and_send_data() {
 	}
 	if (b_CAMMODEDOWN.pressed())
 	{
-		//Next vessel switch if switch is toggled down
-		keyboardEmulatorMessage keystroke_down(0xDD);
-		mySimpit.send(KEYBOARD_EMULATOR, keystroke_down);
+		//Change camera mode if switch is toggled down
+		if (cameraMode == 6) {
+			cameraMode = 1;
+		}
+		else {
+			cameraMode++;
+		}
+		mySimpit.setCameraMode(cameraMode);
 	}
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	

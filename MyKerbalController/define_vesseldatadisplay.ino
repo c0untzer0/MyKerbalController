@@ -769,7 +769,7 @@ void define_vessel_data_display() {
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	//Prepare to light up corresponding SAS LED
-	switch (sas_mode) {
+	switch (temp_sas_mode) {
 	case SMOFF:
 		sasInputBytes[0] = B00000000;
 		sasInputBytes[1] = B00000000;
