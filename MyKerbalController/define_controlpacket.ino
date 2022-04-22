@@ -5,24 +5,24 @@ void check_rotary() {
 	mySimpit.printToKSP((String)"DBG: "+__LINE__+":"+__FUNCTION__);
 
     int temp_sas_mode = sas_mode;
-    //Remove the step logic for middle steps, as two steps make one SAS change
-    //if ((sasPreviousCLK == 0) && (sasPreviousDATA == 1)) {
-    //  if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
-    //    sas_mode ++;
-    //  }
-    //  if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
-    //    sas_mode --;
-    //  }
-    //}
+    
+    if ((sasPreviousCLK == 0) && (sasPreviousDATA == 1)) {
+      if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
+        sas_mode ++;
+      }
+      if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
+        sas_mode --;
+      }
+    }
 
-    //if ((sasPreviousCLK == 1) && (sasPreviousDATA == 0)) {
-    //  if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
-    //    sas_mode ++;
-    //  }
-    //  if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
-    //    sas_mode --;
-    //  }
-    //}
+    if ((sasPreviousCLK == 1) && (sasPreviousDATA == 0)) {
+      if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
+        sas_mode ++;
+      }
+      if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
+        sas_mode --;
+      }
+    }
 
     if ((sasPreviousCLK == 1) && (sasPreviousDATA == 1)) {
         if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
@@ -79,34 +79,27 @@ void check_and_send_data() {
 	b_CAMMODEUP.update();
 	b_CAMMODEDOWN.update();
 
-	mySimpit.printToKSP("Bounce switches updated at Arduino...");
-
 	//toggle switches
 	if (digitalRead(pSAS) && !sas_is_on) {
 		mySimpit.activateAction(SAS_ACTION);
-		mySimpit.printToKSP("SAS active sent from Arduino...");
 		sas_led_on = true;
 	}
-	else if (sas_is_on) {
+	else if (!digitalRead(pSAS) && sas_is_on) {
 		mySimpit.deactivateAction(SAS_ACTION);
-		mySimpit.printToKSP("SAS deactive sent from Arduino...");
 		sas_led_on = false;
 	}
 	if (digitalRead(pRCS) && !rcs_is_on) {
 		mySimpit.activateAction(RCS_ACTION);
-		mySimpit.printToKSP("RCS active sent from Arduino...");
 		rcs_led_on = true;
 	}
-	else if (rcs_is_on) {
+	else if (!digitalRead(pRCS) && rcs_is_on) {
 		mySimpit.deactivateAction(RCS_ACTION);
-		mySimpit.printToKSP("RCS deactive sent from Arduino...");
 		rcs_led_on = false;
 	}
 
 	//momentary abort button
 	if (b_ABORTBTN.pressed() && digitalRead(pABORT)) {
 		mySimpit.activateAction(ABORT_ACTION);
-		mySimpit.printToKSP("Abort active sent from Arduino...");
 	}
 	//else { mySimpit.deactivateAction(ABORT_ACTION); }
 	if (digitalRead(pABORT)) {
@@ -124,7 +117,6 @@ void check_and_send_data() {
 	if (b_STAGE.pressed() && digitalRead(pARM))
 	{
 		mySimpit.activateAction(STAGE_ACTION);
-		mySimpit.printToKSP("Stage active sent from Arduino...");
 	}
 	//else { mySimpit.deactivateAction(STAGE_ACTION); }
 	if (digitalRead(pARM)) {
@@ -142,7 +134,6 @@ void check_and_send_data() {
 	//toggle buttons
 	if (b_LIGHTS.pressed()) {
 		mySimpit.toggleAction(LIGHT_ACTION);
-		mySimpit.printToKSP("Lights toggle sent from Arduino...");
 		lights_on = !lights_on;
 	}
 	if (b_GEARS.pressed()) { mySimpit.toggleAction(GEAR_ACTION); }
@@ -160,13 +151,12 @@ void check_and_send_data() {
 
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
-	/*
+	
 	//throttle
 	throttleMessage throttle_msg;
 	throttle_msg.throttle = map(analogRead(pTHROTTLE), 30, 990, INT16_MAX, 0);
 	if (old_throttle != throttle_msg.throttle) {
 		mySimpit.send(THROTTLE_MESSAGE, throttle_msg);
-		mySimpit.printToKSP("Throttle sent from Arduino...");
 		old_throttle = throttle_msg.throttle;
 	}
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
@@ -176,9 +166,7 @@ void check_and_send_data() {
 	if (!b_RB.pressed() && rb_prev) { rb_prev = false; }
 
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-	*/
 
-	/*
 	//Send Joysticks info
 	rotationMessage rot_msg;
 	translationMessage tra_msg;
@@ -218,7 +206,6 @@ void check_and_send_data() {
 	mySimpit.printToKSP("Joysticks info sent from Arduino...");
 	
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-	*/
 
 	//translation joystick button resets camera view to neutral
 	if (b_TB.pressed() && !tb_prev) { tb_on = !tb_on; tb_prev = true; }
@@ -283,7 +270,6 @@ void check_and_send_data() {
 	setCameraMode(cameraMode);
 	*/
 
-	/* Debugging
 	//Set the View toggle switch actions
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	if (b_CAMMODEUP.pressed())
@@ -303,7 +289,7 @@ void check_and_send_data() {
 		mySimpit.printToKSP("View button2 info sent from Arduino...");
 	}
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-	*/
+	
 }
 
 /* Maybe not needed?

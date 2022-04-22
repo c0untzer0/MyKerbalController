@@ -23,7 +23,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
     case ACTIONSTATUS_MESSAGE:
         // Checking if the message is the size we expect is a very basic
         // way to confirm if the message was received properly.
-		mySimpit.printToKSP("ACTIONSTATUS_MESSAGE received at Arduino...");
         if (msgSize == 1) {
             currentActionStatus = msg[0];
 
@@ -63,12 +62,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
             }
         }
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("ACTIONSTATUS_MESSAGE processed at Arduino...");
-		mySimpit.printToKSP((String)"STATE: S:"+sas_is_on+" R:"+rcs_is_on+" B:"+brakes_on+" G:"+gears_on+" L:"+lights_on);
         break;
 	//Custom Action Group Messages
     case CAGSTATUS_MESSAGE:
-		mySimpit.printToKSP("CAGSTATUS_MESSAGE received at Arduino...");
         if (msgSize == sizeof(cagStatusMessage)) {
             cagStatusMessage cagStatus;
             cagStatus = parseMessage<cagStatusMessage>(msg);
@@ -134,23 +130,18 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
             }
         }
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("CAGSTATUS_MESSAGE processed at Arduino...");
-		mySimpit.printToKSP((String)"CAGSTATE: C:" + chutes_on + " S:" + solar_on + " L:" + ladder_on + " 1:" + action1_on + " 2:" + action2_on);
         break;
 	//SAS Mode Messages
     case SAS_MODE_INFO_MESSAGE:
-		mySimpit.printToKSP("SAS_MODE_INFO_MESSAGE received at Arduino...");
         if (msgSize == sizeof(SASInfoMessage)) {
             SASInfoMessage SASModeInfo;
             SASModeInfo = parseMessage<SASInfoMessage>(msg);
             sas_mode = SASModeInfo.currentSASMode;
         }
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("SAS_MODE_INFO_MESSAGE processed at Arduino...");
         break;
 	//Fuel Messages
     case LF_MESSAGE:
-		mySimpit.printToKSP("LF_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage liquidFuelInfo;
             liquidFuelInfo = parseMessage<resourceMessage>(msg);
@@ -158,10 +149,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.LiquidFuelTot = liquidFuelInfo.total;
         }
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("LF_MESSAGE processed at Arduino...");
         break;
     case SF_MESSAGE:
-		mySimpit.printToKSP("SF_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage solidFuelInfo;
             solidFuelInfo = parseMessage<resourceMessage>(msg);
@@ -169,10 +158,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.SolidFuelTot = solidFuelInfo.total;
         }
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("SF_MESSAGE processed at Arduino...");
         break;
     case OX_MESSAGE:
-		mySimpit.printToKSP("OX_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage oxidizerInfo;
             oxidizerInfo = parseMessage<resourceMessage>(msg);
@@ -180,10 +167,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.OxidizerTot = oxidizerInfo.total;
         }
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("OX_MESSAGE processed at Arduino...");
         break;
     case ELECTRIC_MESSAGE:
-		mySimpit.printToKSP("ELECTRIC_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage ecInfo;
             ecInfo = parseMessage<resourceMessage>(msg);
@@ -191,10 +176,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.ecTotal = ecInfo.total;
         }
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("ELECTRIC_MESSAGE processed at Arduino...");
         break;
     case MONO_MESSAGE:
-		mySimpit.printToKSP("MONO_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage monoPropInfo;
             monoPropInfo = parseMessage<resourceMessage>(msg);
@@ -202,10 +185,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.monoPropTotal = monoPropInfo.total;
         }
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("MONO_MESSAGE processed at Arduino...");
         break;
     case XENON_GAS_MESSAGE:
-		mySimpit.printToKSP("XENON_GAS_MESSAGE received at Arduino...");
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage xenonGasInfo;
             xenonGasInfo = parseMessage<resourceMessage>(msg);
@@ -213,8 +194,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.xenonGasTotal = xenonGasInfo.total;
         }
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("XENON_GAS_MESSAGE processed at Arduino...");
         break;
+	/* Economizing subscriptions
     case CUSTOM_RESOURCE_1_MESSAGE:
 		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE received at Arduino...");
         if (msgSize == sizeof(CustomResourceMessage)) {
@@ -228,9 +209,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE processed at Arduino...");
         break;
+    */
     //Altitude Message
 	case ALTITUDE_MESSAGE:
-		mySimpit.printToKSP("ALTITUDE_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(altitudeMessage)) {
 			altitudeMessage altitudeInfo;
 			altitudeInfo = parseMessage<altitudeMessage>(msg);
@@ -238,11 +219,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.RAlt = altitudeInfo.surface;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("ALTITUDE_MESSAGE processed at Arduino...");
 		break;
 	//Apoapsis and Periapsis Message
 	case APSIDES_MESSAGE:
-		mySimpit.printToKSP("APSIDES_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(apsidesMessage)) {
 			apsidesMessage apsidesInfo;
 			apsidesInfo = parseMessage<apsidesMessage>(msg);
@@ -250,11 +229,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.PE = apsidesInfo.periapsis;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("APSIDES_MESSAGE processed at Arduino...");
 		break;
 	//Velocity Message
 	case VELOCITY_MESSAGE:
-		mySimpit.printToKSP("VELOCITY_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(velocityMessage)) {
 			velocityMessage velocityInfo;
 			velocityInfo = parseMessage<velocityMessage>(msg);
@@ -263,11 +240,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.VVI = velocityInfo.vertical;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("VELOCITY_MESSAGE processed at Arduino...");
 		break;
 	//Times to apoapsis and periapsis
     case APSIDESTIME_MESSAGE:
-		mySimpit.printToKSP("APSIDESTIME_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(apsidesTimeMessage)) {
 			apsidesTimeMessage apsidesTimeInfo;
 			apsidesTimeInfo = parseMessage<apsidesTimeMessage>(msg);
@@ -275,8 +250,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.TPe = apsidesTimeInfo.periapsis;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("APSIDESTIME_MESSAGE processed at Arduino...");
 		break;
+	/* Economizing subscriptions
     //Target info message
 	case TARGETINFO_MESSAGE:
 		mySimpit.printToKSP("TARGETINFO_MESSAGE received at Arduino...");
@@ -293,9 +268,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("TARGETINFO_MESSAGE processed at Arduino...");
 		break;
+	*/
     //Orbit message
 	case ORBIT_MESSAGE:
-		mySimpit.printToKSP("ORBIT_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(orbitInfoMessage)) {
 			orbitInfoMessage orbitInfo;
 			orbitInfo = parseMessage<orbitInfoMessage>(msg);
@@ -309,8 +284,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.LongAscNode = orbitInfo.longAscendingNode;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("ORBIT_MESSAGE processed at Arduino...");
 		break;
+	/* Economizing subscriptions
     //Flight status message
 	case FLIGHT_STATUS_MESSAGE:
 		mySimpit.printToKSP("FLIGHT_STATUS_MESSAGE received at Arduino...");
@@ -323,9 +298,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("FLIGHT_STATUS_MESSAGE processed at Arduino...");
 		break;
+	*/	
 	//Airspeed message
 	case AIRSPEED_MESSAGE:
-		mySimpit.printToKSP("AIRSPEED_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(airspeedMessage)) {
 			airspeedMessage airspeedInfo;
 			airspeedInfo = parseMessage<airspeedMessage>(msg);
@@ -333,11 +308,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.MachNumber = airspeedInfo.mach;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("AIRSPEED_MESSAGE processed at Arduino...");
 		break;
 	//Rotation message
 	case ROTATION_DATA:
-		mySimpit.printToKSP("ROTATION_DATA received at Arduino...");
 		if (msgSize == sizeof(vesselPointingMessage)) {
 			vesselPointingMessage pointingInfo;
 			pointingInfo = parseMessage<vesselPointingMessage>(msg);
@@ -346,11 +319,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.Roll = pointingInfo.roll;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("ROTATION_DATA processed at Arduino...");
 		break;
 	//DeltaV message
 	case DELTAV_MESSAGE:
-		mySimpit.printToKSP("DELTAV_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(deltaVMessage)) {
 			deltaVMessage deltaVInfo;
 			deltaVInfo = parseMessage<deltaVMessage>(msg);
@@ -358,11 +329,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.TotalDeltaV = deltaVInfo.totalDeltaV;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("DELTAV_MESSAGE processed at Arduino...");
 		break;
 	//Burn Time message
 	case BURNTIME_MESSAGE:
-		mySimpit.printToKSP("BURNTIME_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(burnTimeMessage)) {
 			burnTimeMessage burnTInfo;
 			burnTInfo = parseMessage<burnTimeMessage>(msg);
@@ -370,11 +339,9 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.BurnTimeS = burnTInfo.stageBurnTime;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("BURNTIME_MESSAGE processed at Arduino...");
 		break;
 	//Temperature Limits message
 	case TEMP_LIMIT_MESSAGE:
-		mySimpit.printToKSP("TEMP_LIMIT_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(tempLimitMessage)) {
 			tempLimitMessage tempLimitInfo;
 			tempLimitInfo = parseMessage<tempLimitMessage>(msg);
@@ -382,22 +349,18 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.MaxSkinOverheat = tempLimitInfo.skinTempLimitPercentage;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("TEMP_LIMIT_MESSAGE processed at Arduino...");
 		break;
 	//Atmospheric conditions message
 	case ATMO_CONDITIONS_MESSAGE:
-		mySimpit.printToKSP("ATMO_CONDITIONS_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(atmoConditionsMessage)) {
 			atmoConditionsMessage atmoInfo;
 			atmoInfo = parseMessage<atmoConditionsMessage>(msg);
 			VData.Density = atmoInfo.airDensity;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("ATMO_CONDITIONS_MESSAGE processed at Arduino...");
 		break;
 	//Maneuver message
 	case MANEUVER_MESSAGE:
-		mySimpit.printToKSP("MANEUVER_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(maneuverMessage)) {
 			maneuverMessage maneuverInfo;
 			maneuverInfo = parseMessage<maneuverMessage>(msg);
@@ -407,8 +370,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.MNDeltaVTotal = maneuverInfo.deltaVTotal;
 		}
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("MANEUVER_MESSAGE processed at Arduino...");
 		break;
+	/* Economizing subscriptions
 	//SOI message
 	case SOI_MESSAGE:
 		mySimpit.printToKSP("SOI_MESSAGE received at Arduino...");
@@ -416,6 +379,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("SOI_MESSAGE processed at Arduino...");
 		break;
+	*/
     }
 
 }
@@ -478,7 +442,7 @@ void define_vessel_data_display() {
 		}
 		strRAlt.toCharArray(bufferRAlt, 17);
 		writeLCD(bufferRAlt);
-		mySimpit.printToKSP("Speed calculations done at Arduino...");
+
 	}
 
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
@@ -746,7 +710,6 @@ void define_vessel_data_display() {
 		vXX = 100 * VData.customResource2Available / VData.customResource2Total; //percentage of Xenon Gas remaining
 	}
 	else { vXX = 0; }
-	mySimpit.printToKSP("Fuel calculations done at Arduino");
 
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
@@ -771,17 +734,6 @@ void define_vessel_data_display() {
 	int powXE = 0.1 + pow(2, XE);
 	int powLI = 0.1 + pow(2, LI);
 	int powXX = 0.1 + pow(2, XX);
-
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-
-	mySimpit.printToKSP((String)"Arduino SF Fuel at: " + powSF);
-	mySimpit.printToKSP((String)"Arduino LF Fuel at: " + powLF);
-	mySimpit.printToKSP((String)"Arduino OX Fuel at: " + powOX);
-	mySimpit.printToKSP((String)"Arduino MP Fuel at: " + powMP);
-	mySimpit.printToKSP((String)"Arduino EL Fuel at: " + powEL);
-	mySimpit.printToKSP((String)"Arduino XE Fuel at: " + powXE);
-	mySimpit.printToKSP((String)"Arduino LI Fuel at: " + powLI);
-	mySimpit.printToKSP((String)"Arduino XX Fuel at: " + powXX);
 
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
@@ -815,7 +767,6 @@ void define_vessel_data_display() {
 	digitalWrite(latchPin, HIGH);
 
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-	mySimpit.printToKSP("Fuel display calculations done at Arduino");
 
 	//Prepare to light up corresponding SAS LED
 	switch (sas_mode) {
@@ -885,7 +836,6 @@ void define_vessel_data_display() {
 	digitalWrite(sasLEDLatch, HIGH);
 
 	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-	mySimpit.printToKSP("SAS display calculations done at Arduino");
 }
 
 int get_vessel_data() {

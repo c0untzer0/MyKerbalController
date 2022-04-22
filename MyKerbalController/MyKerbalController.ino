@@ -305,8 +305,6 @@ void setup() {
     mySerial.begin(9600); //LCD connection
     delay(500);           //wait for LCD boot
 
-    mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-
     //write to LCD
     clearLCD();
     writeLCD("KerbalController");
@@ -346,34 +344,36 @@ void setup() {
         // flight scene is active in-game.
         mySimpit.registerChannel(ACTIONSTATUS_MESSAGE);
         // Send registration for Custom Action Groups
-        mySimpit.registerChannel(CAGSTATUS_MESSAGE);
+        //mySimpit.registerChannel(CAGSTATUS_MESSAGE);
         // Send registration for SAS Info
         mySimpit.registerChannel(SAS_MODE_INFO_MESSAGE);
         // Send registration for Fuel types
         //mySimpit.registerChannel(LF_MESSAGE);
-        mySimpit.registerChannel(LF_MESSAGE);
-        mySimpit.registerChannel(SF_MESSAGE);
-        mySimpit.registerChannel(OX_MESSAGE);
-        mySimpit.registerChannel(ELECTRIC_MESSAGE);
-        mySimpit.registerChannel(MONO_MESSAGE);
-        mySimpit.registerChannel(XENON_GAS_MESSAGE);
-        mySimpit.registerChannel(CUSTOM_RESOURCE_1_MESSAGE);
+        //mySimpit.registerChannel(LF_MESSAGE);
+        //mySimpit.registerChannel(SF_MESSAGE);
+        //mySimpit.registerChannel(OX_MESSAGE);
+        //mySimpit.registerChannel(ELECTRIC_MESSAGE);
+        //mySimpit.registerChannel(MONO_MESSAGE);
+        //mySimpit.registerChannel(XENON_GAS_MESSAGE);
         //Register for altitude,AP/PE,velocity and time to AP/PE info
-        mySimpit.registerChannel(ALTITUDE_MESSAGE);
-        mySimpit.registerChannel(APSIDES_MESSAGE);
-        mySimpit.registerChannel(VELOCITY_MESSAGE);
-        mySimpit.registerChannel(APSIDESTIME_MESSAGE);
+        //mySimpit.registerChannel(ALTITUDE_MESSAGE);
+        //mySimpit.registerChannel(APSIDES_MESSAGE);
+        //mySimpit.registerChannel(VELOCITY_MESSAGE);
+        //mySimpit.registerChannel(APSIDESTIME_MESSAGE);
+        //mySimpit.registerChannel(ORBIT_MESSAGE);
+        //mySimpit.registerChannel(AIRSPEED_MESSAGE);
+        //mySimpit.registerChannel(ROTATION_DATA);
+        //mySimpit.registerChannel(DELTAV_MESSAGE);
+        //mySimpit.registerChannel(BURNTIME_MESSAGE);
+        //mySimpit.registerChannel(TEMP_LIMIT_MESSAGE);
+        //mySimpit.registerChannel(ATMO_CONDITIONS_MESSAGE);
+        //mySimpit.registerChannel(MANEUVER_MESSAGE);
+        /* Economizing subscriptions
+        mySimpit.registerChannel(CUSTOM_RESOURCE_1_MESSAGE);
         mySimpit.registerChannel(TARGETINFO_MESSAGE);
-        mySimpit.registerChannel(ORBIT_MESSAGE);
         mySimpit.registerChannel(FLIGHT_STATUS_MESSAGE);
-        mySimpit.registerChannel(AIRSPEED_MESSAGE);
-        mySimpit.registerChannel(ROTATION_DATA);
-        mySimpit.registerChannel(DELTAV_MESSAGE);
-        mySimpit.registerChannel(BURNTIME_MESSAGE);
-        mySimpit.registerChannel(TEMP_LIMIT_MESSAGE);
-        mySimpit.registerChannel(ATMO_CONDITIONS_MESSAGE);
-        mySimpit.registerChannel(MANEUVER_MESSAGE);
         mySimpit.registerChannel(SOI_MESSAGE);
+         */
     }
 }
 
@@ -614,15 +614,12 @@ void loop() {
         //KSP mode
         mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         //Send and Receive data
-        Serial.flush();
-
-        mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         mySimpit.update();
         mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-        get_vessel_data();
+        //get_vessel_data();
         mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
         //send_control_data();
-        //check_and_send_data();
+        check_and_send_data();
     }
 }
 
