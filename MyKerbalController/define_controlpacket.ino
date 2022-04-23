@@ -24,72 +24,7 @@ void rotary_helper(bool clockwise)
 
 
 void check_rotary() {
-	sasCurrentCLK = digitalRead(sasClockPin);
 
-	/*
-	if (sasCurrentCLK != sasPreviousCLK)
-	{
-		if (digitalRead(sasDataPin) != sasCurrentCLK) {
-			temp_sas_mode++;
-			mySimpit.printToKSP("SAS Rotary movement CW");
-			rotary_helper(true);
-		}
-		else
-		{
-			temp_sas_mode--;
-			mySimpit.printToKSP("SAS Rotary movement CCW");
-			rotary_helper(false);
-		}
-	}
-	*/
-
-	/*
-	if ((sasPreviousCLK == 0) && (sasPreviousDATA == 1)) {
-		if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
-			mySimpit.printToKSP("SAS Rotary movement CW");
-			temp_sas_mode++;
-			rotary_helper(true);
-		}
-		else if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
-			mySimpit.printToKSP("SAS Rotary movement CCW");
-			temp_sas_mode--;
-			rotary_helper(false);
-		}
-	} else if ((sasPreviousCLK == 1) && (sasPreviousDATA == 0)) {
-		if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
-			mySimpit.printToKSP("SAS Rotary movement CW");
-			temp_sas_mode++;
-			rotary_helper(true);
-		}
-		else if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
-			mySimpit.printToKSP("SAS Rotary movement CCW");
-			temp_sas_mode--;
-			rotary_helper(false);
-		}
-	} else if ((sasPreviousCLK == 1) && (sasPreviousDATA == 1)) {
-		if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
-			mySimpit.printToKSP("SAS Rotary movement CW");
-			temp_sas_mode++;
-			rotary_helper(true);
-		}
-		else if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 0)) {
-			mySimpit.printToKSP("SAS Rotary movement CCW");
-			temp_sas_mode--;
-			rotary_helper(false);
-		}
-	} else if ((sasPreviousCLK == 0) && (sasPreviousDATA == 0)) {
-		if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 0)) {
-			mySimpit.printToKSP("SAS Rotary movement CW");
-			temp_sas_mode++;
-			rotary_helper(true);
-		}
-		else if ((digitalRead(sasClockPin) == 1) && (digitalRead(sasDataPin) == 1)) {
-			mySimpit.printToKSP("SAS Rotary movement CCW");
-			temp_sas_mode--;
-			rotary_helper(false);
-		}
-	}
-	*/
 	//Each stop in the encoder is two steps
 	if ((sasPreviousCLK == 1) && (sasPreviousDATA == 1)) {
 		if ((digitalRead(sasClockPin) == 0) && (digitalRead(sasDataPin) == 1)) {
@@ -122,14 +57,13 @@ void check_and_send_data() {
 	if (((millis() - sasTimeOfLastDebounce) > sasDelayofDebounce) && sas_is_on) {
 
 		check_rotary();  // Rotary Encoder check routine below
-
 		sasPreviousCLK = digitalRead(sasClockPin);
 		sasPreviousDATA = digitalRead(sasDataPin);
-
 		sasTimeOfLastDebounce = millis();  // Set variable to current millis() timer
 	}
 
 	//here we define what controls to send when which pins are manipulated
+
 	//First, update all temporary switches using Bounce2
 	b_TB.update();
 	b_RB.update();
@@ -167,10 +101,12 @@ void check_and_send_data() {
 	}
 	if (digitalRead(pRCS) && !rcs_is_on) {
 		mySimpit.activateAction(RCS_ACTION);
+		rcs_is_on = true;
 		rcs_led_on = true;
 	}
 	else if (!digitalRead(pRCS) && rcs_is_on) {
 		mySimpit.deactivateAction(RCS_ACTION);
+		rcs_is_on = false;
 		rcs_led_on = false;
 	}
 
@@ -208,24 +144,72 @@ void check_and_send_data() {
 	digitalWrite(pSTAGELED, stage_led_on);
 
 	//toggle buttons
+	//Sometimes an update from KSimpit will be delayed,
+	//cache the button status until updated
 	if (b_LIGHTS.pressed()) {
 		mySimpit.toggleAction(LIGHT_ACTION);
 		lights_on = !lights_on;
 	}
-	if (b_GEARS.pressed()) { mySimpit.toggleAction(GEAR_ACTION); }
-	if (b_BRAKES.pressed()) { mySimpit.toggleAction(BRAKES_ACTION); }
-	if (b_ACTION1.pressed()) { mySimpit.toggleCAG(1); }
-	if (b_ACTION2.pressed()) { mySimpit.toggleCAG(2); }
-	if (b_ACTION3.pressed()) { mySimpit.toggleCAG(3); }
-	if (b_ACTION4.pressed()) { mySimpit.toggleCAG(4); }
-	if (b_ACTION5.pressed()) { mySimpit.toggleCAG(5); }
-	if (b_ACTION6.pressed()) { mySimpit.toggleCAG(6); }
-	if (b_ACTION7.pressed()) { mySimpit.toggleCAG(7); }
-	if (b_LADDER.pressed()) { mySimpit.toggleCAG(8); }
-	if (b_SOLAR.pressed()) { mySimpit.toggleCAG(9); }
-	if (b_CHUTES.pressed()) { mySimpit.toggleCAG(10); }
-
-
+	if (b_GEARS.pressed())
+	{
+		mySimpit.toggleAction(GEAR_ACTION);
+		gears_on = !gears_on;
+	}
+	if (b_BRAKES.pressed())
+	{
+		mySimpit.toggleAction(BRAKES_ACTION);
+		brakes_on = !brakes_on;
+	}
+	if (b_ACTION1.pressed())
+	{
+		mySimpit.toggleCAG(1);
+		action1_on = !action1_on;
+	}
+	if (b_ACTION2.pressed())
+	{
+		mySimpit.toggleCAG(2);
+		action2_on = !action2_on;
+	}
+	if (b_ACTION3.pressed())
+	{
+		mySimpit.toggleCAG(3);
+		action3_on = !action3_on;
+	}
+	if (b_ACTION4.pressed())
+	{
+		mySimpit.toggleCAG(4);
+		action4_on = !action4_on;
+	}
+	if (b_ACTION5.pressed())
+	{
+		mySimpit.toggleCAG(5);
+		action5_on = !action5_on;
+	}
+	if (b_ACTION6.pressed())
+	{
+		mySimpit.toggleCAG(6);
+		action6_on = !action6_on;
+	}
+	if (b_ACTION7.pressed())
+	{
+		mySimpit.toggleCAG(7);
+		action7_on = !action7_on;
+	}
+	if (b_LADDER.pressed())
+	{
+		mySimpit.toggleCAG(8);
+		ladder_on = !ladder_on;
+	}
+	if (b_SOLAR.pressed())
+	{
+		mySimpit.toggleCAG(9);
+		solar_on = !solar_on;
+	}
+	if (b_CHUTES.pressed())
+	{
+		mySimpit.toggleCAG(10);
+		chutes_on = !chutes_on;
+	}
 	
 	//throttle
 	throttleMessage throttle_msg;
@@ -268,8 +252,8 @@ void check_and_send_data() {
 	}
 	else {
 		//airplane mode
-		if (analogRead(pRX) >= 530) { roll = constrain(map(analogRead(pRX), 1019, 550, INT16_MAX, 0), 0, INT16_MAX); }
-		else if (analogRead(pRX) <= 470) { roll = constrain(map(analogRead(pRX), 450, 0, 0, INT16_MIN), INT16_MIN, 0); }
+		if (analogRead(pRX) >= 530) { roll = constrain(map(analogRead(pRX), 550, 1019, 0, INT16_MIN), INT16_MIN, 0); }
+		else if (analogRead(pRX) <= 470) { roll = constrain(map(analogRead(pRX), 0, 450, INT16_MAX, 0), 0, INT16_MAX); }
 		if (analogRead(pRY) >= 530) { pitch = constrain(map(analogRead(pRY), 530, 1019, 0, INT16_MAX), 0, INT16_MAX); }
 		else if (analogRead(pRY) <= 470) { pitch = constrain(map(analogRead(pRY), 0, 470, INT16_MIN, 0), INT16_MIN, 0); }
 		if (analogRead(pTX) >= 530) { yaw = constrain(map(analogRead(pTX), 1019, 530, INT16_MIN, 0), INT16_MIN, 0); }

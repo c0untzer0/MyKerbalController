@@ -185,7 +185,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.xenonGasTotal = xenonGasInfo.total;
         }
         break;
-	/* Economizing subscriptions
     case CUSTOM_RESOURCE_1_MESSAGE:
 		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE received at Arduino...");
         if (msgSize == sizeof(CustomResourceMessage)) {
@@ -199,7 +198,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE processed at Arduino...");
         break;
-    */
     //Altitude Message
 	case ALTITUDE_MESSAGE:
 		if (msgSize == sizeof(altitudeMessage)) {
@@ -376,20 +374,22 @@ void define_vessel_data_display() {
 	// 4 xyZ Re-Entry Mode:    Percentage overheating (max) /   Deceleration (G)
 	// 5 XyZ Flying Mode:      Altitude / Mach number
 	// 6 xYZ Landing Mode:     Radar Altitude / Vertical Velocity
-	// 7 XYZ Extra Mode:       Not implemented yet. Possibly DeltaV left on Vessel / Total Burn Time?  
+	// 7 XYZ Extra Mode:       Not implemented yet. Possibly DeltaV left on Vessel / Total Burn Time?
 
-	/*Shut down code party for testing
-
+	//NOT WRITING TO SERIAL LCD FOR NOW, AS IT SEEMS TO PRESENT ISSUES
+	//Leaving the math in, so keep an eye on execution times
+	
 	if (digitalRead(pLCDx) && digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 0 : TakeOff Mode
 		//Vsurf
-		clearLCD();
+		//clearLCD();
 		char bufferVsurf[17];
 		String strVsurf = "Vsurf: ";
 		strVsurf += String(VData.Vsurf, 0);
 		strVsurf += " m/s";
 		strVsurf.toCharArray(bufferVsurf, 17);
-		writeLCD(bufferVsurf);
+		//writeLCD(bufferVsurf);
+
 		// Unable to display acceleration for now, as KSimpit does not provide it
 		////Acceleration (G)
 		//jumpToLineTwo();
@@ -401,7 +401,7 @@ void define_vessel_data_display() {
 		//writeLCD(bufferGee);
 		
 		//Radar Altitude (m)
-		jumpToLineTwo();
+		//jumpToLineTwo();
 		char bufferRAlt[17];
 		String strRAlt = "Alt: ";
 		if (VData.RAlt < 10000 && VData.RAlt > -10000) {
@@ -421,15 +421,14 @@ void define_vessel_data_display() {
 			strRAlt += "Gm ";
 		}
 		strRAlt.toCharArray(bufferRAlt, 17);
-		writeLCD(bufferRAlt);
+		//writeLCD(bufferRAlt);
 
 	}
-
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
+	
 
 	if (!digitalRead(pLCDx) && digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 1: Orbit Mode
-		clearLCD();
+		//clearLCD();
 
 		//Apoapsis
 		char bufferAP[17];
@@ -453,7 +452,7 @@ void define_vessel_data_display() {
 		strApo += String(VData.TAp); //time to apoapsis
 		strApo += "s";
 		strApo.toCharArray(bufferAP, 17);
-		writeLCD(bufferAP);
+		//writeLCD(bufferAP);
 
 		//Periapsis
 		char bufferPE[17];
@@ -477,64 +476,59 @@ void define_vessel_data_display() {
 		strPeri += String(VData.TPe); //time to periapsis
 		strPeri += "s";
 		strPeri.toCharArray(bufferPE, 17);
-		jumpToLineTwo();
-		writeLCD(bufferPE);
+		//jumpToLineTwo();
+		//writeLCD(bufferPE);
 	}
-
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	if (digitalRead(pLCDx) && !digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 2: Maneuver Mode
 		//MNTime
-		clearLCD();
+		//clearLCD();
 		char t[10];
 		dtostrf(VData.MNTime, 8, 0, t);
-		writeLCD("Tnode: ");
-		writeLCD(t);
-		writeLCD("s");
+		//writeLCD("Tnode: ");
+		//writeLCD(t);
+		//writeLCD("s");
 		//MNDeltaV
-		jumpToLineTwo();
+		//jumpToLineTwo();
 		char bufferMNDeltaV[17];
 		String strMNDeltaV = "dV: ";
 		strMNDeltaV += String(VData.MNDeltaV, 0);
 		strMNDeltaV += " m/s";
 		strMNDeltaV.toCharArray(bufferMNDeltaV, 17);
-		writeLCD(bufferMNDeltaV);
+		//writeLCD(bufferMNDeltaV);
 	}
-
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	if (!digitalRead(pLCDx) && !digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 3: Rendezvouz Mode
 		//Target Distance
-		clearLCD();
+		//clearLCD();
 		char bufferTargetDist[17];
 		String strTargetDist = "TDist: ";
 		strTargetDist += String(VData.TargetDist, 0);
 		strTargetDist += " m";
 		strTargetDist.toCharArray(bufferTargetDist, 17);
-		writeLCD(bufferTargetDist);
+		//writeLCD(bufferTargetDist);
 		//Target Velocity
-		jumpToLineTwo();
+		//jumpToLineTwo();
 		char bufferTargetV[17];
 		String strTargetV = "TVel: ";
 		strTargetV += String(VData.TargetV, 0);
 		strTargetV += " m/s";
 		strTargetV.toCharArray(bufferTargetV, 17);
-		writeLCD(bufferTargetV);
+		//writeLCD(bufferTargetV);
 	}
-
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	if (digitalRead(pLCDx) && digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 4: Re-Entry Mode
 		//MaxOverHeat
-		clearLCD();
+		//clearLCD();
 		char t[3];
 		dtostrf(VData.MaxOverHeat, 3, 0, t);
-		writeLCD("Heat: ");
-		writeLCD(t);
-		writeLCD("%");
+		//writeLCD("Heat: ");
+		//writeLCD(t);
+		//writeLCD("%");
+
 		// Unable to display acceleration for now, as KSimpit does not provide it
 		////Acceleration (G)
 		//jumpToLineTwo();
@@ -546,7 +540,7 @@ void define_vessel_data_display() {
 		//writeLCD(bufferGee);
 		
 		//Radar Altitude (m)
-		jumpToLineTwo();
+		//jumpToLineTwo();
 		char bufferRAlt[17];
 		String strRAlt = "Alt: ";
 		if (VData.RAlt < 10000 && VData.RAlt > -10000) {
@@ -566,76 +560,55 @@ void define_vessel_data_display() {
 			strRAlt += "Gm ";
 		}
 		strRAlt.toCharArray(bufferRAlt, 17);
-		writeLCD(bufferRAlt);
+		//writeLCD(bufferRAlt);
 	}
-
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	if (!digitalRead(pLCDx) && digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 5: Flying Mode
 		//Alt
-		clearLCD();
+		//clearLCD();
 		char bufferAtl[17];
 		String strAlt = "Alt:  ";
 		strAlt += String(VData.Alt, 0);
 		strAlt += " m/s";
 		strAlt.toCharArray(bufferAtl, 17);
-		writeLCD(bufferAtl);
+		//writeLCD(bufferAtl);
 		//Mach Number
-		jumpToLineTwo();
+		//jumpToLineTwo();
 		char bufferMachNumber[17];
 		String strMach = "Mach:";
 		strMach += String(VData.MachNumber, 0);
 		strMach.toCharArray(bufferMachNumber, 17);
-		writeLCD(bufferMachNumber);
+		//writeLCD(bufferMachNumber);
 	}
-
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	if (digitalRead(pLCDx) && !digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 6: Landing Mode
 		//RAlt
-		clearLCD();
+		//clearLCD();
 		char bufferRAtl[17];
 		String strRAlt = "RAlt: ";
 		strRAlt += String(VData.RAlt, 0);
 		strRAlt += " m/s";
 		strRAlt.toCharArray(bufferRAtl, 17);
-		writeLCD(bufferRAtl);
+		//writeLCD(bufferRAtl);
 		//Vertical Velocity
-		jumpToLineTwo();
+		//jumpToLineTwo();
 		char bufferVVI[17];
 		String strVVI = "VVI:  ";
 		strVVI += String(VData.VVI, 0);
 		strVVI += " m/s";
 		strVVI.toCharArray(bufferVVI, 17);
-		writeLCD(bufferVVI);
+		//writeLCD(bufferVVI);
 	}
-
-	mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 
 	if (!digitalRead(pLCDx) && !digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 7: Extra Mode
-		clearLCD();
-		writeLCD("KerbalController");
+		//clearLCD();
+		//writeLCD("KerbalController");
 	}
-	*/
-
-
-	//get in-game status for updating the LED statuses on the controller  
-	//lights_on = ControlStatus(AGLight);
-	//gears_on = ControlStatus(AGGears);
-	//brakes_on = ControlStatus(AGBrakes);
-	//action1_on = ControlStatus(AGCustom01);
-	//action2_on = ControlStatus(AGCustom02);
-	//action3_on = ControlStatus(AGCustom03);
-	//action4_on = ControlStatus(AGCustom04);
-	//action5_on = ControlStatus(AGCustom05);
-	//action6_on = ControlStatus(AGCustom06);
-	//action7_on = ControlStatus(AGCustom07);
-	//ladder_on = ControlStatus(AGCustom08);
-	//solar_on = ControlStatus(AGCustom09);
-	//chutes_on = ControlStatus(AGCustom10);
+	
+	
 
 	//update button LEDs based on in-game status
 	digitalWrite(pLIGHTSLED, lights_on);
@@ -814,50 +787,3 @@ int get_vessel_data() {
 	int returnValue = 0;
 	return returnValue;
 }
-
-
-// No longer used either
-/*
-//Enumeration of ActionGroups (includes main controls and custom action groups)
-#define AGSAS      0
-#define AGRCS      1
-#define AGLight    2
-#define AGGears    3
-#define AGBrakes   4
-#define AGAbort    5
-#define AGCustom01 6
-#define AGCustom02 7
-#define AGCustom03 8
-#define AGCustom04 9
-#define AGCustom05 10
-#define AGCustom06 11
-#define AGCustom07 12
-#define AGCustom08 13
-#define AGCustom09 14
-#define AGCustom10 15
-
-//get the current state of main controls and custom action groups using enumeration above, e.g. ControlStatus(AGBrakes);
-byte ControlStatus(byte n)
-{
-  return ((VData.ActionGroups >> n) & 1) == 1;
-}
-
-//get the current SAS Mode. Can be compared to enum values, e.g. if(getSASMode() == SMPrograde){//do stuff}
-byte getSASMode() {
-  return VData.NavballSASMode & B00001111; // leaves alone the lower 4 bits of; all higher bits set to 0.
-}
-
-//get the current navball mode. Can be compared to enum values, e.g. if (getNavballMode() == NAVBallTARGET){//do stuff}
-byte getNavballMode() {
-  return VData.NavballSASMode >> 4; // leaves alone the higher 4 bits of; all lower bits set to 0.
-}
-
-//get the current vessel view. Can be compared to enum values, e.g. if (getCameraMode() == STAGEVIEW){//do stuff}
-byte getCameraMode() {
-  return VData.CameraMode;
-}
-*/
-
-
-
-

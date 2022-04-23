@@ -1,4 +1,4 @@
-/*
+  /*
  Name:		MyKerbalController.ino
  Created:	4/19/2022 3:07:09 PM
  Author:	morgoth
@@ -305,7 +305,9 @@ void reboot() {
 
 void setup() {
 
-    Serial.begin(115200);  //KSPSerialIO connection
+    //Serial.begin(115200);  //KSPSerialIO connection
+    //Slowing down KSP connection to match LCD
+    Serial.begin(115200);
     mySerial.begin(9600); //LCD connection
     setHighLCDRate();
     delay(200);
@@ -358,31 +360,30 @@ void setup() {
         // Send registration for SAS Info
         mySimpit.registerChannel(SAS_MODE_INFO_MESSAGE);
         // Send registration for Fuel types
-        //mySimpit.registerChannel(LF_MESSAGE);
-        //mySimpit.registerChannel(LF_MESSAGE);
-        //mySimpit.registerChannel(SF_MESSAGE);
-        //mySimpit.registerChannel(OX_MESSAGE);
-        //mySimpit.registerChannel(ELECTRIC_MESSAGE);
-        //mySimpit.registerChannel(MONO_MESSAGE);
-        //mySimpit.registerChannel(XENON_GAS_MESSAGE);
+        mySimpit.registerChannel(LF_MESSAGE);
+        mySimpit.registerChannel(SF_MESSAGE);
+        mySimpit.registerChannel(OX_MESSAGE);
+        mySimpit.registerChannel(ELECTRIC_MESSAGE);
+        mySimpit.registerChannel(MONO_MESSAGE);
+        mySimpit.registerChannel(XENON_GAS_MESSAGE);
         //Register for altitude,AP/PE,velocity and time to AP/PE info
-        //mySimpit.registerChannel(ALTITUDE_MESSAGE);
-        //mySimpit.registerChannel(APSIDES_MESSAGE);
-        //mySimpit.registerChannel(VELOCITY_MESSAGE);
-        //mySimpit.registerChannel(APSIDESTIME_MESSAGE);
-        //mySimpit.registerChannel(ORBIT_MESSAGE);
-        //mySimpit.registerChannel(AIRSPEED_MESSAGE);
-        //mySimpit.registerChannel(ROTATION_DATA);
-        //mySimpit.registerChannel(DELTAV_MESSAGE);
-        //mySimpit.registerChannel(BURNTIME_MESSAGE);
-        //mySimpit.registerChannel(TEMP_LIMIT_MESSAGE);
-        //mySimpit.registerChannel(ATMO_CONDITIONS_MESSAGE);
-        //mySimpit.registerChannel(MANEUVER_MESSAGE);
-        /* Economizing subscriptions
+        mySimpit.registerChannel(ALTITUDE_MESSAGE);
+        mySimpit.registerChannel(APSIDES_MESSAGE);
+        mySimpit.registerChannel(VELOCITY_MESSAGE);
+        mySimpit.registerChannel(APSIDESTIME_MESSAGE);
+        mySimpit.registerChannel(ORBIT_MESSAGE);
+        mySimpit.registerChannel(AIRSPEED_MESSAGE);
+        mySimpit.registerChannel(DELTAV_MESSAGE);
+        mySimpit.registerChannel(TEMP_LIMIT_MESSAGE);
+        mySimpit.registerChannel(ATMO_CONDITIONS_MESSAGE);
+        mySimpit.registerChannel(MANEUVER_MESSAGE);
         mySimpit.registerChannel(CUSTOM_RESOURCE_1_MESSAGE);
+        /* Economizing subscriptions
         mySimpit.registerChannel(TARGETINFO_MESSAGE);
         mySimpit.registerChannel(FLIGHT_STATUS_MESSAGE);
         mySimpit.registerChannel(SOI_MESSAGE);
+        mySimpit.registerChannel(ROTATION_DATA);
+        mySimpit.registerChannel(BURNTIME_MESSAGE);
          */
     }
 }
