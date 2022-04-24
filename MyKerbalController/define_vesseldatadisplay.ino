@@ -135,8 +135,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
             SASInfoMessage SASModeInfo;
             SASModeInfo = parseMessage<SASInfoMessage>(msg);
             sas_mode = SASModeInfo.currentSASMode;
-			sas_available = SASModeInfo.SASModeAvailability;
-			mySimpit.printToKSP((String)"Available SAS modes: " + sas_available);
+			sas_available_modes = SASModeInfo.SASModeAvailability;
+			mySimpit.printToKSP((String)"Available SAS modes: " + sas_available_modes);
         }
         break;
 	//Fuel Messages
@@ -224,15 +224,19 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
             customResourceInfo = parseMessage<CustomResourceMessage>(msg);
 			//Do some sanity checks in case I'm overflowing the buffers
 			if (customResourceInfo.currentResource1 >= 0) {
+				//Lithium
 				VData.customResource1Available = customResourceInfo.currentResource1;
 			}
 			if (customResourceInfo.maxResource1 >= 0) {
+				//LithiumTotal
 				VData.customResource1Total = customResourceInfo.maxResource1;
 			}
 			if (customResourceInfo.currentResource2 >= 0) {
+				//IntakeAir
 				VData.customResource2Available = customResourceInfo.currentResource2;
 			}
 			if (customResourceInfo.maxResource2 >= 0) {
+				//IntakeAirTotal
 				VData.customResource2Total = customResourceInfo.maxResource2;
 			}
         }
