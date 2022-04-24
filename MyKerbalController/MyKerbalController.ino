@@ -152,6 +152,7 @@ byte cameraMode;
 //int target_mode;
 int temp_sas_mode = 255;
 int sas_mode = 255;
+int16_t sas_available;
 int prev_sas_mode = 255;
 bool sas_is_on = false;
 bool rcs_is_on = false;
@@ -174,6 +175,9 @@ byte sasInputBytes[2];
 //Variables used for fuel guages
 byte inputBytes[10];
 int vSF, vLF, vOX, vEL, vMP, vXE, vLI, vXX, SF, LF, OX, EL, MP, XE, LI, XX;
+
+//Keep track of how often to update LCD
+int lcd_update_timer = 0;
 
 //Keep Vessel Data in an object
 struct VesselData
@@ -200,10 +204,12 @@ struct VesselData
     float Vsurf;                    //17  surface velocity (m/s)
     //float Lat;                      //18  Latitude (degree)
     //float Lon;                      //19  Longitude (degree)
-    float LiquidFuelTot;            //20  Liquid Fuel Total
-    float LiquidFuel;               //21  Liquid Fuel remaining
-    float OxidizerTot;              //22  Oxidizer Total
-    float Oxidizer;                 //23  Oxidizer remaining
+    //float LiquidFuelTot;            //20  Liquid Fuel Total
+    //float LiquidFuel;               //21  Liquid Fuel remaining
+    float LiquidFuelSTot;            //20  Liquid Fuel Total
+    float LiquidFuelS;               //21  Liquid Fuel remaining
+    //float OxidizerTot;              //22  Oxidizer Total
+    //float Oxidizer;                 //23  Oxidizer remaining
     float ecTotal;                  //24  Electric Charge Total
     float ecAvailable;              //25  Electric Charge remaining
     float monoPropTotal;            //26  Mono Propellant Total
@@ -222,10 +228,10 @@ struct VesselData
     float xenonGasAvailable;       //33  Xenon Gas remaining
     //float liquidFuelSTotal;         //34  Liquid Fuel Total (stage)
     //float liquidFuelSAvailable;     //35  Liquid Fuel remaining (stage)
-    //float oxidizerSTotal;           //36  Oxidizer Total (stage)
-    //float oxidizerSAvailable;       //37  Oxidizer remaining (stage)
-    //float LithiumFuel;              //38  Lithium Fuel Remaining
-    //float LithiumFuelTot;           //39  Lithium Fuel Total
+    float oxidizerSTotal;           //36  Oxidizer Total (stage)
+    float oxidizerSAvailable;       //37  Oxidizer remaining (stage)
+    //float Lithium;              //38  Lithium Fuel Remaining
+    //float LithiumTot;           //39  Lithium Fuel Total
     //uint32_t MissionTime;           //40  Time since launch (s)
     //float deltaTime;                //41  Time since last packet (s)
     float VOrbit;                   //42  Orbital speed (m/s)
@@ -360,9 +366,11 @@ void setup() {
         // Send registration for SAS Info
         mySimpit.registerChannel(SAS_MODE_INFO_MESSAGE);
         // Send registration for Fuel types
-        mySimpit.registerChannel(LF_MESSAGE);
+        //mySimpit.registerChannel(LF_MESSAGE);
+        mySimpit.registerChannel(LF_STAGE_MESSAGE);
         mySimpit.registerChannel(SF_MESSAGE);
-        mySimpit.registerChannel(OX_MESSAGE);
+        //mySimpit.registerChannel(OX_MESSAGE);
+        mySimpit.registerChannel(OX_STAGE_MESSAGE);
         mySimpit.registerChannel(ELECTRIC_MESSAGE);
         mySimpit.registerChannel(MONO_MESSAGE);
         mySimpit.registerChannel(XENON_GAS_MESSAGE);
@@ -373,13 +381,13 @@ void setup() {
         mySimpit.registerChannel(APSIDESTIME_MESSAGE);
         mySimpit.registerChannel(ORBIT_MESSAGE);
         mySimpit.registerChannel(AIRSPEED_MESSAGE);
-        mySimpit.registerChannel(DELTAV_MESSAGE);
+        //mySimpit.registerChannel(DELTAV_MESSAGE);
         mySimpit.registerChannel(TEMP_LIMIT_MESSAGE);
-        mySimpit.registerChannel(ATMO_CONDITIONS_MESSAGE);
+        //mySimpit.registerChannel(ATMO_CONDITIONS_MESSAGE);
         mySimpit.registerChannel(MANEUVER_MESSAGE);
+        mySimpit.registerChannel(TARGETINFO_MESSAGE);
         mySimpit.registerChannel(CUSTOM_RESOURCE_1_MESSAGE);
         /* Economizing subscriptions
-        mySimpit.registerChannel(TARGETINFO_MESSAGE);
         mySimpit.registerChannel(FLIGHT_STATUS_MESSAGE);
         mySimpit.registerChannel(SOI_MESSAGE);
         mySimpit.registerChannel(ROTATION_DATA);

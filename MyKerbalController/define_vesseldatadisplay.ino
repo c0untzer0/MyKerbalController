@@ -130,73 +130,112 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
         break;
 	//SAS Mode Messages
     case SAS_MODE_INFO_MESSAGE:
+		mySimpit.printToKSP("SAS Mode received");
         if (msgSize == sizeof(SASInfoMessage)) {
             SASInfoMessage SASModeInfo;
             SASModeInfo = parseMessage<SASInfoMessage>(msg);
             sas_mode = SASModeInfo.currentSASMode;
+			sas_available = SASModeInfo.SASModeAvailability;
+			mySimpit.printToKSP((String)"Available SAS modes: " + sas_available);
         }
         break;
 	//Fuel Messages
-    case LF_MESSAGE:
+    case LF_STAGE_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
-            resourceMessage liquidFuelInfo;
-            liquidFuelInfo = parseMessage<resourceMessage>(msg);
-			VData.LiquidFuel = liquidFuelInfo.available;
-			VData.LiquidFuelTot = liquidFuelInfo.total;
+            resourceMessage liquidFuelSInfo;
+            liquidFuelSInfo = parseMessage<resourceMessage>(msg);
+			//Do some sanity checks in case I'm overflowing the buffers
+			if (liquidFuelSInfo.available >= 0) {
+				VData.LiquidFuelS = liquidFuelSInfo.available;
+			}
+			if (liquidFuelSInfo.total >= 0) {
+				VData.LiquidFuelSTot = liquidFuelSInfo.total;
+			}
         }
         break;
     case SF_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage solidFuelInfo;
             solidFuelInfo = parseMessage<resourceMessage>(msg);
-			VData.SolidFuel = solidFuelInfo.available;
-			VData.SolidFuelTot = solidFuelInfo.total;
+			//Do some sanity checks in case I'm overflowing the buffers
+			if (solidFuelInfo.available >= 0) {
+				VData.SolidFuel = solidFuelInfo.available;
+			}
+			if (solidFuelInfo.total >= 0) {
+				VData.SolidFuelTot = solidFuelInfo.total;
+			}
         }
         break;
-    case OX_MESSAGE:
+    case OX_STAGE_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
-            resourceMessage oxidizerInfo;
-            oxidizerInfo = parseMessage<resourceMessage>(msg);
-			VData.Oxidizer = oxidizerInfo.available;
-			VData.OxidizerTot = oxidizerInfo.total;
+            resourceMessage oxidizerSInfo;
+            oxidizerSInfo = parseMessage<resourceMessage>(msg);
+			//Do some sanity checks in case I'm overflowing the buffers
+			if (oxidizerSInfo.available >= 0){
+				VData.oxidizerSAvailable = oxidizerSInfo.available;
+			}
+			if (oxidizerSInfo.total >= 0){
+				VData.oxidizerSTotal = oxidizerSInfo.total;
+			}
         }
         break;
     case ELECTRIC_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage ecInfo;
             ecInfo = parseMessage<resourceMessage>(msg);
-			VData.ecAvailable = ecInfo.available;
-			VData.ecTotal = ecInfo.total;
+			//Do some sanity checks in case I'm overflowing the buffers
+			if (ecInfo.available >= 0) {
+				VData.ecAvailable = ecInfo.available;
+			}
+			if (ecInfo.total >= 0) {
+				VData.ecTotal = ecInfo.total;
+			}
         }
         break;
     case MONO_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage monoPropInfo;
             monoPropInfo = parseMessage<resourceMessage>(msg);
-			VData.monoPropAvailable = monoPropInfo.available;
-			VData.monoPropTotal = monoPropInfo.total;
+			//Do some sanity checks in case I'm overflowing the buffers
+			if (monoPropInfo.available >= 0) {
+				VData.monoPropAvailable = monoPropInfo.available;
+			}
+			if (monoPropInfo.total >= 0) {
+				VData.monoPropTotal = monoPropInfo.total;
+			}
         }
         break;
     case XENON_GAS_MESSAGE:
         if (msgSize == sizeof(resourceMessage)) {
             resourceMessage xenonGasInfo;
             xenonGasInfo = parseMessage<resourceMessage>(msg);
-			VData.xenonGasAvailable = xenonGasInfo.available;
-			VData.xenonGasTotal = xenonGasInfo.total;
+			//Do some sanity checks in case I'm overflowing the buffers
+			if (xenonGasInfo.available >= 0) {
+				VData.xenonGasAvailable = xenonGasInfo.available;
+			}
+			if (xenonGasInfo.total >= 0) {
+				VData.xenonGasTotal = xenonGasInfo.total;
+			}
         }
         break;
     case CUSTOM_RESOURCE_1_MESSAGE:
-		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE received at Arduino...");
         if (msgSize == sizeof(CustomResourceMessage)) {
             CustomResourceMessage customResourceInfo;
             customResourceInfo = parseMessage<CustomResourceMessage>(msg);
-			VData.customResource1Available = customResourceInfo.currentResource1;
-			VData.customResource1Total = customResourceInfo.maxResource1;
-			VData.customResource2Available = customResourceInfo.currentResource2;
-			VData.customResource2Total = customResourceInfo.maxResource2;
+			//Do some sanity checks in case I'm overflowing the buffers
+			if (customResourceInfo.currentResource1 >= 0) {
+				VData.customResource1Available = customResourceInfo.currentResource1;
+			}
+			if (customResourceInfo.maxResource1 >= 0) {
+				VData.customResource1Total = customResourceInfo.maxResource1;
+			}
+			if (customResourceInfo.currentResource2 >= 0) {
+				VData.customResource2Available = customResourceInfo.currentResource2;
+			}
+			if (customResourceInfo.maxResource2 >= 0) {
+				VData.customResource2Total = customResourceInfo.maxResource2;
+			}
         }
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("CUSTOM_RESOURCE_1_MESSAGE processed at Arduino...");
         break;
     //Altitude Message
 	case ALTITUDE_MESSAGE:
@@ -235,10 +274,8 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.TPe = apsidesTimeInfo.periapsis;
 		}
 		break;
-	/* Economizing subscriptions
-    //Target info message
+	//Target info message
 	case TARGETINFO_MESSAGE:
-		mySimpit.printToKSP("TARGETINFO_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(targetMessage)) {
 			targetMessage targetInfo;
 			targetInfo = parseMessage<targetMessage>(msg);
@@ -249,10 +286,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.TargetPitchV = targetInfo.velocityPitch;
 			VData.TargetHeadingV = targetInfo.velocityHeading;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("TARGETINFO_MESSAGE processed at Arduino...");
 		break;
-	*/
     //Orbit message
 	case ORBIT_MESSAGE:
 		if (msgSize == sizeof(orbitInfoMessage)) {
@@ -268,20 +302,15 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.LongAscNode = orbitInfo.longAscendingNode;
 		}
 		break;
-	/* Economizing subscriptions
-    //Flight status message
+	//Flight status message
 	case FLIGHT_STATUS_MESSAGE:
-		mySimpit.printToKSP("FLIGHT_STATUS_MESSAGE received at Arduino...");
 		if (msgSize == sizeof(flightStatusMessage)) {
 			flightStatusMessage flightInfo;
 			flightInfo = parseMessage<flightStatusMessage>(msg);
 			VData.CurrentStage = flightInfo.currentStage;
 			VData.TWI = flightInfo.currentTWIndex;
 		}
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("FLIGHT_STATUS_MESSAGE processed at Arduino...");
 		break;
-	*/	
 	//Airspeed message
 	case AIRSPEED_MESSAGE:
 		if (msgSize == sizeof(airspeedMessage)) {
@@ -347,25 +376,18 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 			VData.MNDeltaVTotal = maneuverInfo.deltaVTotal;
 		}
 		break;
-	/* Economizing subscriptions
 	//SOI message
 	case SOI_MESSAGE:
-		mySimpit.printToKSP("SOI_MESSAGE received at Arduino...");
 		VData.SOI = msg[0];
-		mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
-		mySimpit.printToKSP("SOI_MESSAGE processed at Arduino...");
 		break;
-	*/
     }
 
 }
 
-//define what to do with the vessel data here, e.g. turn on LED's, display text on the LCD
-void define_vessel_data_display() {
+//Define what toi display to LCD on a regular basis
+void display_to_lcd()
+{
 
-	//Fuel LED bar charts - NEED TO USE A SHIFT REGISTER to drive the LED bar charts!
-	// to be implemented
-	//mySimpit.printToKSP((String)"DBG: " + __LINE__ + ":" + __FUNCTION__);
 	//LCD Display Modes
 	// 0 xyz TakeOff Mode:     Suface Velocity / Acceleration (G)
 	// 1 Xyz Orbit Mode:       Apoapsis + Time to Apoapsis / Periapsis + Time to Periapsis
@@ -376,19 +398,17 @@ void define_vessel_data_display() {
 	// 6 xYZ Landing Mode:     Radar Altitude / Vertical Velocity
 	// 7 XYZ Extra Mode:       Not implemented yet. Possibly DeltaV left on Vessel / Total Burn Time?
 
-	//NOT WRITING TO SERIAL LCD FOR NOW, AS IT SEEMS TO PRESENT ISSUES
-	//Leaving the math in, so keep an eye on execution times
-	
 	if (digitalRead(pLCDx) && digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 0 : TakeOff Mode
 		//Vsurf
-		//clearLCD();
+		clearLCD();
 		char bufferVsurf[17];
 		String strVsurf = "Vsurf: ";
 		strVsurf += String(VData.Vsurf, 0);
+		//mySimpit.printToKSP((String)"VSurf to display: " + strVsurf);
 		strVsurf += " m/s";
 		strVsurf.toCharArray(bufferVsurf, 17);
-		//writeLCD(bufferVsurf);
+		writeLCD(bufferVsurf);
 
 		// Unable to display acceleration for now, as KSimpit does not provide it
 		////Acceleration (G)
@@ -399,11 +419,11 @@ void define_vessel_data_display() {
 		//strGee += " G";
 		//strGee.toCharArray(bufferGee, 17);
 		//writeLCD(bufferGee);
-		
+
 		//Radar Altitude (m)
-		//jumpToLineTwo();
+		jumpToLineTwo();
 		char bufferRAlt[17];
-		String strRAlt = "Alt: ";
+		String strRAlt = "RAlt: ";
 		if (VData.RAlt < 10000 && VData.RAlt > -10000) {
 			strRAlt += String(VData.RAlt, 0);
 			strRAlt += "m ";
@@ -421,14 +441,14 @@ void define_vessel_data_display() {
 			strRAlt += "Gm ";
 		}
 		strRAlt.toCharArray(bufferRAlt, 17);
-		//writeLCD(bufferRAlt);
+		writeLCD(bufferRAlt);
 
 	}
-	
+
 
 	if (!digitalRead(pLCDx) && digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 1: Orbit Mode
-		//clearLCD();
+		clearLCD();
 
 		//Apoapsis
 		char bufferAP[17];
@@ -452,7 +472,7 @@ void define_vessel_data_display() {
 		strApo += String(VData.TAp); //time to apoapsis
 		strApo += "s";
 		strApo.toCharArray(bufferAP, 17);
-		//writeLCD(bufferAP);
+		writeLCD(bufferAP);
 
 		//Periapsis
 		char bufferPE[17];
@@ -476,58 +496,58 @@ void define_vessel_data_display() {
 		strPeri += String(VData.TPe); //time to periapsis
 		strPeri += "s";
 		strPeri.toCharArray(bufferPE, 17);
-		//jumpToLineTwo();
-		//writeLCD(bufferPE);
+		jumpToLineTwo();
+		writeLCD(bufferPE);
 	}
 
 	if (digitalRead(pLCDx) && !digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 2: Maneuver Mode
 		//MNTime
-		//clearLCD();
+		clearLCD();
 		char t[10];
 		dtostrf(VData.MNTime, 8, 0, t);
-		//writeLCD("Tnode: ");
-		//writeLCD(t);
-		//writeLCD("s");
+		writeLCD("Tnode: ");
+		writeLCD(t);
+		writeLCD("s");
 		//MNDeltaV
-		//jumpToLineTwo();
+		jumpToLineTwo();
 		char bufferMNDeltaV[17];
 		String strMNDeltaV = "dV: ";
 		strMNDeltaV += String(VData.MNDeltaV, 0);
 		strMNDeltaV += " m/s";
 		strMNDeltaV.toCharArray(bufferMNDeltaV, 17);
-		//writeLCD(bufferMNDeltaV);
+		writeLCD(bufferMNDeltaV);
 	}
 
 	if (!digitalRead(pLCDx) && !digitalRead(pLCDy) && digitalRead(pLCDz)) {
 		//MODE 3: Rendezvouz Mode
 		//Target Distance
-		//clearLCD();
+		clearLCD();
 		char bufferTargetDist[17];
 		String strTargetDist = "TDist: ";
 		strTargetDist += String(VData.TargetDist, 0);
 		strTargetDist += " m";
 		strTargetDist.toCharArray(bufferTargetDist, 17);
-		//writeLCD(bufferTargetDist);
+		writeLCD(bufferTargetDist);
 		//Target Velocity
-		//jumpToLineTwo();
+		jumpToLineTwo();
 		char bufferTargetV[17];
 		String strTargetV = "TVel: ";
 		strTargetV += String(VData.TargetV, 0);
 		strTargetV += " m/s";
 		strTargetV.toCharArray(bufferTargetV, 17);
-		//writeLCD(bufferTargetV);
+		writeLCD(bufferTargetV);
 	}
 
 	if (digitalRead(pLCDx) && digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 4: Re-Entry Mode
 		//MaxOverHeat
-		//clearLCD();
+		clearLCD();
 		char t[3];
 		dtostrf(VData.MaxOverHeat, 3, 0, t);
-		//writeLCD("Heat: ");
-		//writeLCD(t);
-		//writeLCD("%");
+		writeLCD("Heat: ");
+		writeLCD(t);
+		writeLCD("%");
 
 		// Unable to display acceleration for now, as KSimpit does not provide it
 		////Acceleration (G)
@@ -538,11 +558,11 @@ void define_vessel_data_display() {
 		//strGee += " G";
 		//strGee.toCharArray(bufferGee, 17);
 		//writeLCD(bufferGee);
-		
+
 		//Radar Altitude (m)
-		//jumpToLineTwo();
+		jumpToLineTwo();
 		char bufferRAlt[17];
-		String strRAlt = "Alt: ";
+		String strRAlt = "RAlt: ";
 		if (VData.RAlt < 10000 && VData.RAlt > -10000) {
 			strRAlt += String(VData.RAlt, 0);
 			strRAlt += "m ";
@@ -560,55 +580,85 @@ void define_vessel_data_display() {
 			strRAlt += "Gm ";
 		}
 		strRAlt.toCharArray(bufferRAlt, 17);
-		//writeLCD(bufferRAlt);
+		writeLCD(bufferRAlt);
 	}
 
 	if (!digitalRead(pLCDx) && digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 5: Flying Mode
 		//Alt
-		//clearLCD();
-		char bufferAtl[17];
+		clearLCD();
+		char bufferAlt[17];
 		String strAlt = "Alt:  ";
-		strAlt += String(VData.Alt, 0);
-		strAlt += " m/s";
-		strAlt.toCharArray(bufferAtl, 17);
-		//writeLCD(bufferAtl);
+		if (VData.Alt < 10000 && VData.Alt > -10000) {
+			strAlt += String(VData.Alt, 0);
+			strAlt += "m ";
+		}
+		else if ((VData.Alt >= 10000 && VData.Alt < 10000000) || (VData.Alt <= -10000 && VData.Alt > -10000000)) {
+			strAlt += String((VData.Alt / 1000.0), 0);
+			strAlt += "km ";
+		}
+		else if ((VData.Alt >= 10000000 && VData.Alt < 10000000000) || (VData.Alt <= -10000000 && VData.Alt > -10000000000)) {
+			strAlt += String((VData.Alt / 1000000.0), 0);
+			strAlt += "Mm ";
+		}
+		else {
+			strAlt += String((VData.Alt / 1000000000.0), 0);
+			strAlt += "Gm ";
+		}
+		strAlt.toCharArray(bufferAlt, 17);
+		writeLCD(bufferAlt);
 		//Mach Number
-		//jumpToLineTwo();
+		jumpToLineTwo();
 		char bufferMachNumber[17];
 		String strMach = "Mach:";
 		strMach += String(VData.MachNumber, 0);
 		strMach.toCharArray(bufferMachNumber, 17);
-		//writeLCD(bufferMachNumber);
+		writeLCD(bufferMachNumber);
 	}
 
 	if (digitalRead(pLCDx) && !digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 6: Landing Mode
 		//RAlt
-		//clearLCD();
-		char bufferRAtl[17];
+		clearLCD();
+		char bufferRAlt[17];
 		String strRAlt = "RAlt: ";
-		strRAlt += String(VData.RAlt, 0);
-		strRAlt += " m/s";
-		strRAlt.toCharArray(bufferRAtl, 17);
-		//writeLCD(bufferRAtl);
+		if (VData.RAlt < 10000 && VData.RAlt > -10000) {
+			strRAlt += String(VData.RAlt, 0);
+			strRAlt += "m ";
+		}
+		else if ((VData.RAlt >= 10000 && VData.RAlt < 10000000) || (VData.RAlt <= -10000 && VData.RAlt > -10000000)) {
+			strRAlt += String((VData.RAlt / 1000.0), 0);
+			strRAlt += "km ";
+		}
+		else if ((VData.RAlt >= 10000000 && VData.RAlt < 10000000000) || (VData.RAlt <= -10000000 && VData.RAlt > -10000000000)) {
+			strRAlt += String((VData.RAlt / 1000000.0), 0);
+			strRAlt += "Mm ";
+		}
+		else {
+			strRAlt += String((VData.RAlt / 1000000000.0), 0);
+			strRAlt += "Gm ";
+		}
+		strRAlt.toCharArray(bufferRAlt, 17);
+		writeLCD(bufferRAlt);
 		//Vertical Velocity
-		//jumpToLineTwo();
+		jumpToLineTwo();
 		char bufferVVI[17];
 		String strVVI = "VVI:  ";
 		strVVI += String(VData.VVI, 0);
 		strVVI += " m/s";
 		strVVI.toCharArray(bufferVVI, 17);
-		//writeLCD(bufferVVI);
+		writeLCD(bufferVVI);
 	}
 
 	if (!digitalRead(pLCDx) && !digitalRead(pLCDy) && !digitalRead(pLCDz)) {
 		//MODE 7: Extra Mode
-		//clearLCD();
-		//writeLCD("KerbalController");
+		clearLCD();
+		writeLCD("KerbalController");
 	}
-	
-	
+}
+
+//define what to do with the vessel data here, e.g. turn on LED's, display text on the LCD
+void define_vessel_data_display() {
 
 	//update button LEDs based on in-game status
 	digitalWrite(pLIGHTSLED, lights_on);
@@ -634,12 +684,12 @@ void define_vessel_data_display() {
 		vSF = 100 * VData.SolidFuel / VData.SolidFuelTot; //percentage of solid fuel remaining
 	}
 	else { vSF = 0; }
-	if (VData.LiquidFuelTot != 0) {
-		vLF = 100 * VData.LiquidFuel / VData.LiquidFuelTot; //percentage of liquid fuel remaining in current stage
+	if (VData.LiquidFuelSTot != 0) {
+		vLF = 100 * VData.LiquidFuelS / VData.LiquidFuelSTot; //percentage of liquid fuel remaining in current stage
 	}
 	else { vLF = 0; }
-	if (VData.OxidizerTot != 0) {
-		vOX = 100 * VData.Oxidizer / VData.OxidizerTot; //percentage of oxidized remaining in current stage
+	if (VData.oxidizerSTotal != 0) {
+		vOX = 100 * VData.oxidizerSAvailable / VData.oxidizerSTotal; //percentage of oxidized remaining in current stage
 	}
 	else { vOX = 0; }
 	if (VData.ecTotal != 0) {
@@ -779,6 +829,13 @@ void define_vessel_data_display() {
 
 	//latch the values in when done shifting
 	digitalWrite(sasLEDLatch, HIGH);
+
+	lcd_update_timer++;
+	if (lcd_update_timer > 79)
+	{
+		display_to_lcd();
+		lcd_update_timer = 0;
+	}
 
 }
 
