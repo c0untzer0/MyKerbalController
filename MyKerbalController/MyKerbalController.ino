@@ -152,7 +152,7 @@ byte cameraMode;
 //int target_mode;
 int temp_sas_mode = 255;
 int sas_mode = 255;
-int16_t sas_available;
+int16_t sas_available_modes;
 int prev_sas_mode = 255;
 bool sas_is_on = false;
 bool rcs_is_on = false;
@@ -166,8 +166,6 @@ int sasPreviousDATA;
 int sasCurrentCLK;
 long sasTimeOfLastDebounce = 0;
 int sasDelayofDebounce = 30;
-bool sas_target_set = false;
-bool sas_maneuver_set = false;
 
 //SAS LEDs variable
 byte sasInputBytes[2];

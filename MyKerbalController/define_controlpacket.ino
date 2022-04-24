@@ -2,22 +2,21 @@
 
 void rotary_helper(bool clockwise)
 {
+	
 	if (clockwise)
 	{
 		if (temp_sas_mode > 9) { temp_sas_mode = 0; }
-		if ((temp_sas_mode == 7 || temp_sas_mode == 8) && (!sas_target_set))
+		while (!(temp_sas_mode & sas_available_modes))
 		{
-			temp_sas_mode = 9;
+			temp_sas_mode++;
 		}
-		if ((temp_sas_mode == 9) && !sas_maneuver_set) { temp_sas_mode = 0; }
 	}
 	else
 	{
 		if (temp_sas_mode < 0) { temp_sas_mode = 9; }
-		if ((temp_sas_mode == 9) && !sas_maneuver_set) { temp_sas_mode = 8; }
-		if ((temp_sas_mode == 7 || temp_sas_mode == 8) && (!sas_target_set))
+		while (!(temp_sas_mode & sas_available_modes))
 		{
-			temp_sas_mode = 6;
+			temp_sas_mode--;
 		}
 	}
 }
