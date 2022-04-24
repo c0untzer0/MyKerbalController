@@ -152,7 +152,7 @@ byte cameraMode;
 //int target_mode;
 int temp_sas_mode = 255;
 int sas_mode = 255;
-int16_t sas_available_modes;
+int16_t sas_available_modes = 1023;
 byte bit_sas;
 int prev_sas_mode = 255;
 bool sas_is_on = false;
