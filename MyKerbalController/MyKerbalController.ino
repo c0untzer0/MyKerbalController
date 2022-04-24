@@ -153,6 +153,7 @@ byte cameraMode;
 int temp_sas_mode = 255;
 int sas_mode = 255;
 int16_t sas_available_modes;
+byte bit_sas;
 int prev_sas_mode = 255;
 bool sas_is_on = false;
 bool rcs_is_on = false;
