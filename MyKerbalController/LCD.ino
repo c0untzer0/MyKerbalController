@@ -1,34 +1,34 @@
 void setHighLCDRate()
 {
-  mySerial.write(0x7C);
-  mySerial.write(0x10);
+  Serial2.write(0x7C);
+  Serial2.write(0x10);
 }
 
 void jumpToStart()
 {
 	//Jump to the start of the first line on the LCD
-	mySerial.write(254);
-	mySerial.write(128);
+	Serial2.write(254);
+	Serial2.write(128);
 }
 
 void clearLCD()
 {
 	//Clear the LCD by writing all spaces
 	jumpToStart();
-	mySerial.write("                ");
-	mySerial.write("                ");
+	Serial2.write("                ");
+	Serial2.write("                ");
 	jumpToStart();
 }
 
 void jumpToLineTwo()
 {
 	//Jump to the start of the second line on the LCD
-	mySerial.write(254);
-	mySerial.write(192);
+	Serial2.write(254);
+	Serial2.write(192);
 }
 
 void writeLCD(char myText[])
 {
 	//Write text to the LCD
-	mySerial.write(myText);
+	Serial2.write(myText);
 }

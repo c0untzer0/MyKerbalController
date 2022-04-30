@@ -5,78 +5,78 @@
 */
 
 #include <Bounce2.h>
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 #include <KerbalSimpit.h>
 #include <avr/wdt.h>
 
-SoftwareSerial mySerial(15, 14); //Pin 14 connected to LCD, 15 unconnected
+//SoftwareSerial mySerial(15, 14); //Pin 14 connected to LCD, 15 unconnected
 
 
 //Analog pins
-const int pTHROTTLE = A0; //slide pot
-const int pTX = A1;       //translation x-axis
-const int pTY = A2;       //translation y-axis
-const int pTZ = A3;       //translation z-axis
-const int pRX = A4;       //rotation x-axis
+const int pTHROTTLE = A8; //slide pot
+const int pTX = A2;       //translation x-axis
+const int pTY = A1;       //translation y-axis
+const int pTZ = A0;       //translation z-axis
+const int pRX = A6;       //rotation x-axis
 const int pRY = A5;       //rotation y-axis
-const int pRZ = A6;       //rotation z-axis
+const int pRZ = A4;       //rotation z-axis
 
 //Digital pins
-const int pPOWER = 16;      //power switch
-const int pTB = 2;          //translation joystick button
-const int pRB = 3;          //rotation joystick button
-const int latchPin = 11;    //ST_CP - green
-const int dataPin = 10;     //DS - yellow
-const int clockPin = 12;    //SH_CP - blue
-const int sasClockPin = 4;  //SAS Selector Clock Pin Connector
-const int sasDataPin = 5;   //SAS Selector Data Pin Connector
-const int pSASBTN = 6;      //SAS Selector Switch
-const int sasLEDLatch = 8;  //SAS LED indicator latch pin
-const int sasLEDData = 7;   //SAS LED indicator data pin
-const int sasLEDClock = 9;  //SAS LED indicator clock pin
-const int pMODE = 22;       //mode switch (used for debug mode)
-const int pLCDx = 27;       //toggle switch x (used for LCD display modes)
-const int pLCDy = 24;       //toggle switch y (used for LCD display modes)
-const int pLCDz = 29;       //toggle switch z (used for LCD display modes)
-const int pSAS = 26;        //SAS switch
-const int pRCS = 31;        //RCS switch
-const int pABORT = 28;      //Abort switch (safety switch, active high)
-const int pABORTBTN = 23;   //Abort button
-const int pABORTBTNLED = 25;//Abort button LED
-const int pARM = 30;        //Arm switch (safety switch, active high)
-const int pSTAGE = 32;      //Stage button
-const int pSTAGELED = 33;   //Stage button LED
-const int pLIGHTS = 34;     //Lights button
-const int pLIGHTSLED = 35;  //Lights button LED
-const int pLADDER = 36;     //Ladder button (action group 8)
-const int pLADDERLED = 37;  //Ladder button LED
-const int pSOLAR = 38;      //Solar button (action group 9)
-const int pSOLARLED = 39;   //Solar button LED
-const int pCHUTES = 40;     //Chutes button (action group 10)
-const int pCHUTESLED = 41;  //Chutes button LED
-const int pGEARS = 42;      //Gears button
-const int pGEARSLED = 43;   //Gears button LED
-const int pBRAKES = 44;     //Brakes button
-const int pBRAKESLED = 45;  //Brakes button LED
-const int pACTION1 = 46;    //Action Group 1 button
-const int pACTION1LED = 47; //Action Group 1 button LED
-const int pACTION2 = 48;    //Action Group 2 button
-const int pACTION2LED = 49; //Action Group 2 button LED
-const int pACTION3 = 50;    //Action Group 3 button
-const int pACTION3LED = 51; //Action Group 3 button LED
-const int pACTION4 = 52;    //Action Group 4 button
-const int pACTION4LED = 53; //Action Group 4 button LED
-const int pACTION5 = 69;    //Action Group 5 button
-const int pACTION5LED = 68; //Action Group 5 button LED
-const int pACTION6 = 67;    //Action Group 6 button
-const int pACTION6LED = 66; //Action Group 6 button LED
-const int pACTION7 = 65;    //Action Group 7 button
-const int pACTION7LED = 64; //Action Group 7 button LED
-const int pCAMMODEUP = 62;  //View mode toggle switch up
-const int pCAMMODEDOWN = 63;//View mode toggle switch down
-const int pSASONLED = 13;   //SAS On LED indicator
+const int pPOWER = 53;      //power switch
+const int pTB = 57;         //translation joystick button
+const int pRB = 61;         //rotation joystick button
+const int latchPin = 5;     //ST_CP - green
+const int dataPin = 7;      //DS - yellow
+const int clockPin = 6;     //SH_CP - blue
+const int sasClockPin = 21; //SAS Selector Clock Pin Connector
+const int sasDataPin = 20;  //SAS Selector Data Pin Connector
+const int pSASBTN = 19;      //SAS Selector Switch
+const int sasLEDLatch = 2;  //SAS LED indicator latch pin
+const int sasLEDData = 4;   //SAS LED indicator data pin
+const int sasLEDClock = 3;  //SAS LED indicator clock pin
+const int pMODE = 69;       //mode switch (used for debug mode)
+const int pLCDx = 39;       //toggle switch x (used for LCD display modes)
+const int pLCDy = 41;       //toggle switch y (used for LCD display modes)
+const int pLCDz = 43;       //toggle switch z (used for LCD display modes)
+const int pSAS = 63;        //SAS switch
+const int pRCS = 64;        //RCS switch
+const int pABORT = 8;       //Abort switch (safety switch, active high)
+const int pABORTBTN = 10;   //Abort button
+const int pABORTBTNLED = 9; //Abort button LED
+const int pARM = 11;        //Arm switch (safety switch, active high)
+const int pSTAGE = 13;      //Stage button
+const int pSTAGELED = 12;   //Stage button LED
+const int pLIGHTS = 26;     //Lights button
+const int pLIGHTSLED = 34;  //Lights button LED
+const int pLADDER = 28;     //Ladder button (action group 8)
+const int pLADDERLED = 36;  //Ladder button LED
+const int pSOLAR = 30;      //Solar button (action group 9)
+const int pSOLARLED = 38;   //Solar button LED
+const int pCHUTES = 32;     //Chutes button (action group 10)
+const int pCHUTESLED = 40;  //Chutes button LED
+const int pGEARS = 22;      //Gears button
+const int pGEARSLED = 42;   //Gears button LED
+const int pBRAKES = 24;     //Brakes button
+const int pBRAKESLED = 44;  //Brakes button LED
+const int pACTION1 = 23;    //Action Group 1 button
+const int pACTION1LED = 31; //Action Group 1 button LED
+const int pACTION2 = 25;    //Action Group 2 button
+const int pACTION2LED = 33; //Action Group 2 button LED
+const int pACTION3 = 27;    //Action Group 3 button
+const int pACTION3LED = 35; //Action Group 3 button LED
+const int pACTION4 = 29;    //Action Group 4 button
+const int pACTION4LED = 37; //Action Group 4 button LED
+const int pACTION5 = 45;    //Action Group 5 button
+const int pACTION5LED = 46; //Action Group 5 button LED
+const int pACTION6 = 47;    //Action Group 6 button
+const int pACTION6LED = 48; //Action Group 6 button LED
+const int pACTION7 = 49;    //Action Group 7 button
+const int pACTION7LED = 50; //Action Group 7 button LED
+const int pCAMMODEUP = 65;  //View mode toggle switch up
+const int pCAMMODEDOWN = 66;//View mode toggle switch down
+const int pSASONLED = 67;   //SAS On LED indicator
 //const int pRCSONLED = 16;   //RCS On LED indicator
-const int pRCSONLED = 61;   //RCS On LED indicator
+const int pRCSONLED = 68;   //RCS On LED indicator
 
 //Setup Bounce2 objects
 Bounce2::Button b_TB = Bounce2::Button();
@@ -313,10 +313,10 @@ void setup() {
     //Serial.begin(115200);  //KSPSerialIO connection
     //Slowing down KSP connection to match LCD
     Serial.begin(115200);
-    mySerial.begin(9600); //LCD connection
+    Serial2.begin(9600); //LCD connection
     setHighLCDRate();
     delay(200);
-    mySerial.begin(38400);
+    Serial2.begin(38400);
     delay(500);           //wait for LCD boot
 
     //write to LCD
