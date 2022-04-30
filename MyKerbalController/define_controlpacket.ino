@@ -4,24 +4,38 @@ void rotary_helper(bool clockwise)
 {
 	if (clockwise)
 	{
-		if (temp_sas_mode > 9) { temp_sas_mode = 0; }
+		if (temp_sas_mode > 9)
+		{
+			temp_sas_mode = 0;
+		}
 		//Make sure we forward to the next available SAS mode
-		bit_sas = (1 << (byte)temp_sas_mode);
+		bit_sas = (1 << temp_sas_mode);
 		while (!(bit_sas & sas_available_modes))
 		{
 			temp_sas_mode++;
-			bit_sas = (1 << (byte)temp_sas_mode);
+			if (temp_sas_mode > 9)
+			{
+				temp_sas_mode = 0;
+			}
+			bit_sas = (1 << temp_sas_mode);
 		}
 	}
 	else
 	{
-		if (temp_sas_mode < 0) { temp_sas_mode = 9; }
-		//Make sure we backrack to the next available SAS mode
-		bit_sas = (1 << (byte)temp_sas_mode);
+		if (temp_sas_mode < 0)
+		{
+			temp_sas_mode = 9;
+		}
+		//Make sure we backtrack to the next available SAS mode
+		bit_sas = (1 << temp_sas_mode);
 		while (!(bit_sas & sas_available_modes))
 		{
 			temp_sas_mode--;
-			bit_sas = (1 << (byte)temp_sas_mode);
+			if (temp_sas_mode < 0)
+			{
+				temp_sas_mode = 9;
+			}
+			bit_sas = (1 << temp_sas_mode);
 		}
 	}
 }
