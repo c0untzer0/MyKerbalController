@@ -5,12 +5,8 @@
 */
 
 #include <Bounce2.h>
-//#include <SoftwareSerial.h>
 #include <KerbalSimpit.h>
 #include <avr/wdt.h>
-
-//SoftwareSerial mySerial(15, 14); //Pin 14 connected to LCD, 15 unconnected
-
 
 //Analog pins
 const int pTHROTTLE = A8; //slide pot
@@ -75,7 +71,6 @@ const int pACTION7LED = 50; //Action Group 7 button LED
 const int pCAMMODEUP = 65;  //View mode toggle switch up
 const int pCAMMODEDOWN = 66;//View mode toggle switch down
 const int pSASONLED = 67;   //SAS On LED indicator
-//const int pRCSONLED = 16;   //RCS On LED indicator
 const int pRCSONLED = 68;   //RCS On LED indicator
 
 //Setup Bounce2 objects
