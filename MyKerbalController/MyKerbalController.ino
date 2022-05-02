@@ -144,7 +144,6 @@ int rz_value;
 byte cameraMode;
 
 //SAS mode variables
-//int target_mode;
 int temp_sas_mode = 255;
 int sas_mode = 255;
 int16_t sas_available_modes = 1023;
@@ -305,8 +304,6 @@ void reboot() {
 
 void setup() {
 
-    //Serial.begin(115200);  //KSPSerialIO connection
-    //Slowing down KSP connection to match LCD
     Serial.begin(115200);
     Serial2.begin(9600); //LCD connection
     setHighLCDRate();
