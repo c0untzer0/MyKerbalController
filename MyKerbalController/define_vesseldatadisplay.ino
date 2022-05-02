@@ -136,7 +136,6 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
             SASModeInfo = parseMessage<SASInfoMessage>(msg);
             sas_mode = SASModeInfo.currentSASMode;
 			sas_available_modes = SASModeInfo.SASModeAvailability;
-			mySimpit.printToKSP((String)"Available SAS modes: " + sas_available_modes);
         }
         break;
 	//Fuel Messages
