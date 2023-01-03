@@ -324,7 +324,7 @@ void messageHandler(byte messageType, byte msg[], byte msgSize) {
 		}
 		break;
 	//Rotation message
-	case ROTATION_DATA:
+	case ROTATION_DATA_MESSAGE:
 		if (msgSize == sizeof(vesselPointingMessage)) {
 			vesselPointingMessage pointingInfo;
 			pointingInfo = parseMessage<vesselPointingMessage>(msg);
